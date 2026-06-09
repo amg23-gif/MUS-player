@@ -513,7 +513,7 @@
     var cats=['الكل'];
     CHS.forEach(function(c){ if(cats.indexOf(c.cat)<0) cats.push(c.cat); });
     document.getElementById('cats').innerHTML = cats.map(function(c){
-      return '<div class="cat'+(aCat===c?' on':'')+'" onclick="setCat(''+escHtml(c)+'')">'+escHtml(c)+'</div>';
+      return '<div class="cat'+(aCat===c?' on':'')+'" onclick="setCat(\''+escHtml(c)+'\')" >'+escHtml(c)+'</div>';
     }).join('');
   }
 
@@ -675,8 +675,7 @@
   }
 
   function parseM3U(text){
-    var lines=text.split('
-'); var chs=[]; var cur=null;
+    var lines=text.split('\n'); var chs=[]; var cur=null;
     lines.forEach(function(line){
       line=line.trim();
       if(line.indexOf('#EXTINF')===0){
