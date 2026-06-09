@@ -296,14 +296,13 @@
   function imgSrc(logo){ return logo && logo.trim() ? logo : ''; }
 
   // Build a thumbnail element — safe, no inline SVG escaping issues
-  function makeLogo(logo, size) {
-    var w = size||50, h = size ? Math.round(size*0.65) : 32;
-    if (logo && logo.trim()) {
-      return '<img src="' + escHtml(logo) + '" width="' + w + '" height="' + h + '" style="object-fit:contain" onerror="this.style.display='none'" loading="lazy"/>';
+  function imgErr(img){ img.style.display='none'; }
+    function makeLogo(logo, size) {
+      if (logo && logo.trim()) {
+        return '<img src="' + escHtml(logo) + '" onerror="imgErr(this)" loading="lazy" style="width:100%;height:100%;object-fit:contain"/>';
+      }
+      return '📺';
     }
-    return '📺';
-  }
-
   function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   // ─── Player ───
