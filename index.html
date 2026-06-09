@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+  <html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover"/>
+    <meta name="theme-color" content="#07090f"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+    <title>MUS Player</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js"></script>
+    <style>
+      *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+      :root{--bg:#07090f;--surface:#0c1020;--card:#111827;--border:#1e2a45;--accent:#e63946;--accent2:#c1121f;--text:#f1f5f9;--muted:#64748b;--live:#10b981;--gold:#f59e0b;--blue:#3b82f6;--purple:#8b5cf6;--radius:14px;--radius-sm:9px;--font:'Cairo',system-ui,sans-serif;}
+      body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden;display:flex;flex-direction:column;-webkit-tap-highlight-color:transparent;user-select:none;}
+      ::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px}
+      header{background:linear-gradient(135deg,#090e20,#12082a);border-bottom:2px solid var(--accent);position:sticky;top:0;z-index:1000;backdrop-filter:blur(20px);}
+      .hdr{max-width:1920px;margin:0 auto;height:68px;display:flex;align-items:center;padding:0 20px;gap:14px;}
+      .logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+      .logo-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--accent),#7c0012);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;box-shadow:0 0 20px rgba(230,57,70,.4);overflow:hidden;}
+      .logo-text h1{font-size:18px;font-weight:900;letter-spacing:-.5px;color:var(--text)}.logo-text small{font-size:10px;color:var(--gold);display:block;font-weight:600;letter-spacing:1px}
+      .search-wrap{flex:1;max-width:380px;position:relative;}
+      .search-wrap input{width:100%;background:rgba(255,255,255,.05);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 18px 10px 44px;color:var(--text);font-size:15px;outline:none;font-family:var(--font);transition:.2s;}
+      .search-wrap input:focus{border-color:var(--accent);background:rgba(255,255,255,.07)}
+      .search-wrap .si{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px;pointer-events:none;}
+      .hdr-btns{display:flex;gap:8px;margin-right:auto;}
+      .ibtn{width:44px;height:44px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:rgba(255,255,255,.03);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:.2s;}
+      .ibtn:hover,.ibtn:focus{background:rgba(255,255,255,.08);color:var(--text);outline:2px solid var(--accent)}.ibtn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+      .layout{flex:1;display:flex;max-width:1920px;margin:0 auto;width:100%}
+      .sidebar{width:340px;flex-shrink:0;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;height:calc(100vh - 68px);position:sticky;top:68px;overflow:hidden;transition:width .3s;}
+      .sidebar.closed{width:0;border-left:none}
+      .sb-head{padding:16px;border-bottom:1px solid var(--border);flex-shrink:0}
+      .sb-head h2{font-size:11px;color:var(--muted);margin-bottom:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+      .cats{display:flex;gap:6px;flex-wrap:wrap}
+      .cat{background:var(--card);border:1.5px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:700;transition:.2s;white-space:nowrap;}
+      .cat:hover{background:rgba(255,255,255,.07);color:var(--text)}.cat.on{background:var(--accent);border-color:var(--accent);color:#fff}
+      .ch-list{flex:1;overflow-y:auto;padding:8px;}
+      .ch-item{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;border-radius:10px;margin-bottom:4px;border:2px solid transparent;background:rgba(255,255,255,.015);transition:.15s;outline:none;}
+      .ch-item:hover{background:rgba(255,255,255,.04)}.ch-item.playing{border-color:var(--accent)!important;background:rgba(230,57,70,.12)!important}
+      .ch-item:focus,.ch-item.focused{border-color:var(--gold);background:rgba(245,158,11,.1);outline:none}
+      .ch-thumb{width:52px;height:34px;border-radius:6px;background:#000;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+      .ch-thumb img{width:100%;height:100%;object-fit:contain}
+      .ch-info{flex:1;min-width:0}.ch-info .name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ch-info .sub{font-size:11px;color:var(--muted);margin-top:1px}
+      .badge{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:800;letter-spacing:.5px}
+      .b-hd{background:rgba(245,158,11,.15);color:var(--gold)}.b-4k{background:rgba(139,92,246,.15);color:var(--purple)}.b-live{background:rgba(16,185,129,.15);color:var(--live)}
+      .fav{background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);transition:.2s;padding:4px}.fav:hover{transform:scale(1.3)}.fav.on{color:var(--gold)}
+      .main{flex:1;display:flex;flex-direction:column;min-width:0;}
+      .player-wrap{position:relative;background:#000;width:100%;aspect-ratio:16/9;overflow:hidden;border-bottom:2px solid rgba(230,57,70,.2);}
+      video{width:100%;height:100%;display:block;object-fit:contain}
+      .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(7,9,15,.93);z-index:10;backdrop-filter:blur(12px);transition:opacity .3s;}
+      .overlay.gone{opacity:0;pointer-events:none}
+      .ov-logo{width:100px;height:100px;background:linear-gradient(135deg,var(--accent),#7c0012);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;margin-bottom:16px;overflow:hidden;box-shadow:0 0 40px rgba(230,57,70,.3);}
+      .ov-logo img{width:100%;height:100%;object-fit:cover}.ov-msg{font-size:17px;font-weight:700;margin-bottom:6px}.ov-sub{font-size:13px;color:var(--muted)}
+      .spinner{width:50px;height:50px;border:4px solid rgba(255,255,255,.08);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:16px;}
+      @keyframes spin{to{transform:rotate(360deg)}}
+      .info-bar{background:var(--surface);padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--border);}
+      .info-name{font-size:17px;font-weight:800}.info-sub{font-size:13px;color:var(--muted);margin-top:2px}
+      .q-btns{display:flex;gap:6px;margin-right:auto;}
+      .qb{background:var(--card);border:1.5px solid var(--border);padding:7px 16px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;color:var(--text);transition:.2s;font-family:var(--font);font-weight:600;}
+      .qb:hover{background:var(--border)}.qb.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+      .err-bar{background:rgba(230,57,70,.07);border-top:1px solid rgba(230,57,70,.2);padding:12px 20px;display:none;align-items:center;gap:10px;}
+      .err-bar span{flex:1;font-size:13px;color:var(--accent)}.err-bar button{padding:8px 20px;background:var(--accent);border:none;border-radius:var(--radius-sm);color:#fff;cursor:pointer;font-weight:700;font-family:var(--font);}
+      .grid-sec{padding:16px 20px 60px;}.grid-title{font-size:18px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px}.gc-cnt{font-size:13px;color:var(--muted);font-weight:600}
+      .ch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px}
+      .gc{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:18px 12px;cursor:pointer;text-align:center;transition:.2s;outline:none;}
+      .gc:hover,.gc:focus{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 24px rgba(230,57,70,.14)}
+      .gc-logo{width:70px;height:46px;display:flex;align-items:center;justify-content:center;background:#000;margin:0 auto 10px;border-radius:6px;overflow:hidden}
+      .gc-logo img{width:100%;height:100%;object-fit:contain}.gc-name{font-size:13px;font-weight:700;margin-bottom:3px}.gc-sub{font-size:11px;color:var(--muted)}
+      .no-res{text-align:center;padding:60px 20px;color:var(--muted);}.no-res .ni{font-size:48px;margin-bottom:12px;opacity:.4}
+      .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--card);color:var(--text);padding:12px 28px;border-radius:30px;z-index:9999;display:none;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.6);border:1px solid var(--border);font-size:14px;white-space:nowrap;}
+      .toast.show{display:block;animation:toastIn .25s ease}.toast.ok{border-color:var(--live);color:var(--live)}.toast.err{border-color:var(--accent);color:var(--accent)}
+      @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(16px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+      .admin-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9000;display:none;padding:24px;overflow-y:auto;backdrop-filter:blur(6px);}
+      .admin-backdrop.open{display:flex;align-items:flex-start;justify-content:center;}
+      .admin-box{background:#0c1120;border:1px solid #253050;border-radius:var(--radius);width:100%;max-width:920px;margin-top:20px;box-shadow:0 40px 80px rgba(0,0,0,.8);}
+      .admin-head{background:linear-gradient(135deg,#0f1830,#1a0c2e);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;border-radius:var(--radius) var(--radius) 0 0;border-bottom:1px solid #253050;}
+      .admin-head h2{font-size:18px;font-weight:900}
+      .admin-close{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;transition:.2s;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:6px;}
+      .admin-close:hover{color:#fff;background:rgba(255,255,255,.08)}
+      .admin-tabs{display:flex;border-bottom:1px solid #253050;overflow-x:auto;}
+      .atab{padding:13px 20px;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);transition:.2s;white-space:nowrap;font-size:14px;font-weight:700;}
+      .atab:hover{color:var(--text)}.atab.on{border-bottom-color:var(--accent);color:var(--text)}
+      .admin-body{padding:24px;}.sec{display:none}.sec.on{display:block}
+      .lbl{display:block;margin-bottom:5px;color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+      .fg2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}.fg{display:flex;flex-direction:column;}
+      .fi{background:rgba(255,255,255,.05);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:11px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;transition:.2s;}
+      .fi:focus{border-color:var(--accent);background:rgba(255,255,255,.07)}.fi option{background:#0c1120}
+      .sr-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+      .sr{display:flex;gap:8px;align-items:center;}.sr .fi{flex:1}.sr .ql{max-width:88px!important;flex:none!important;}
+      .del-s{background:rgba(230,57,70,.1);border:1px solid rgba(230,57,70,.2);color:var(--accent);width:34px;height:34px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.2s;}
+      .del-s:hover{background:var(--accent);color:#fff}
+      .add-s{background:rgba(255,255,255,.03);border:1.5px dashed var(--border);color:var(--muted);padding:10px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-family:var(--font);width:100%;transition:.2s;font-weight:600;}
+      .add-s:hover{border-color:var(--accent);color:var(--accent)}
+      .act-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+      .btn-p{background:var(--accent);border:none;color:#fff;padding:11px 26px;border-radius:var(--radius-sm);cursor:pointer;font-weight:700;font-size:14px;font-family:var(--font);transition:.2s;}.btn-p:hover{background:var(--accent2)}
+      .btn-s{background:var(--card);border:1.5px solid var(--border);color:var(--text);padding:11px 24px;border-radius:var(--radius-sm);cursor:pointer;font-size:14px;font-family:var(--font);transition:.2s;font-weight:600;}.btn-s:hover{background:var(--border)}
+      .hr{border:none;border-top:1px solid var(--border);margin:18px 0}
+      .acl{display:flex;flex-direction:column;gap:8px;}
+      .ach{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--card);border-radius:10px;border:1px solid var(--border);}
+      .ath{width:44px;height:30px;border-radius:5px;background:#000;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+      .ath img{width:100%;height:100%;object-fit:contain}.an{flex:1;min-width:0}.an strong{display:block;font-size:14px;font-weight:700}.an small{color:var(--muted);font-size:11px}
+      .aa{display:flex;gap:6px;}.aa button{padding:7px 14px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;font-family:var(--font);transition:.2s;}
+      .be{background:rgba(59,130,246,.12);color:var(--blue)}.be:hover{background:var(--blue);color:#fff}
+      .bd{background:rgba(230,57,70,.1);color:var(--accent)}.bd:hover{background:var(--accent);color:#fff}
+      .m3ua{width:100%;min-height:160px;background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text);font-family:monospace;font-size:12px;resize:vertical;outline:none;direction:ltr;}.m3ua:focus{border-color:var(--accent)}
+      .sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:18px;}
+      .sc{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;text-align:center;}.sc .v{font-size:30px;font-weight:900;color:var(--accent)}.sc .l{font-size:11px;color:var(--muted);margin-top:4px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+      .eb{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:var(--radius-sm);padding:10px 16px;margin-bottom:14px;color:var(--blue);font-size:13px;font-weight:700;display:none;}.eb.show{display:block}
+      .is{margin-top:12px;padding:12px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;display:none;}
+      .is.ok{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:var(--live);display:block}
+      .is.err{background:rgba(230,57,70,.08);border:1px solid rgba(230,57,70,.2);color:var(--accent);display:block}
+      @keyframes lp{0%,100%{opacity:1}50%{opacity:.4}}
+      .ld{display:inline-block;width:7px;height:7px;background:var(--live);border-radius:50%;margin-right:4px;animation:lp 1.4s ease infinite;vertical-align:middle}
+      @media(min-width:1280px){.player-wrap{aspect-ratio:unset;height:calc(100vh - 68px - 58px - 38px);}}
+      @media(max-width:1023px){.sidebar{position:fixed;top:68px;right:0;z-index:999;height:calc(100vh - 68px);width:300px}.sidebar.closed{width:0}}
+      @media(max-width:640px){.hdr{padding:0 10px;gap:8px}.logo-text h1{font-size:15px}.search-wrap{max-width:160px}.fg2{grid-template-columns:1fr}.admin-body{padding:14px}}
+    </style>
+  </head>
+  <body>
+  <header>
+    <div class="hdr">
+      <div class="logo">
+        <div class="logo-icon"><img src="https://image.qwenlm.ai/public_source/30b33922-da5a-4b70-9ad7-2ab7ac57119e/1972c8aa0-f22d-480f-ac63-45874086aba6.png" alt="M" style="width:100%;height:100%;object-fit:cover;border-radius:10px" onerror="this.parentElement.textContent='M'"/></div>
+        <div class="logo-text"><h1>MUS Player</h1><small>LIVE TV &amp; 4K</small></div>
+      </div>
+      <div class="search-wrap">
+        <span class="si">&#128269;</span>
+        <input id="sq" type="search" placeholder="&#1575;&#1576;&#1581;&#1579; &#1593;&#1606; &#1602;&#1606;&#1575;&#1577;..." autocomplete="off" dir="rtl"/>
+      </div>
+      <div class="hdr-btns">
+        <button class="ibtn" id="btnFav" onclick="tFav()" title="&#1575;&#1604;&#1605;&#1601;&#1590;&#1604;&#1577;">&#9733;</button>
+        <button class="ibtn" id="btnSB" onclick="tSB()" title="&#1575;&#1604;&#1602;&#1575;&#1574;&#1605;&#1577;">&#9776;</button>
+      </div>
+    </div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-head">
+        <h2>&#1575;&#1604;&#1578;&#1589;&#1606;&#1610;&#1601;&#1575;&#1578;</h2>
+        <div class="cats" id="catRow"></div>
+      </div>
+      <div class="ch-list" id="chList" tabindex="0"></div>
+    </aside>
+    <main class="main">
+      <div class="player-wrap">
+        <video id="vid" controls playsinline></video>
+        <div class="overlay" id="overlay">
+          <div class="ov-logo"><img id="ovLg" src="" alt="MUS" onerror="this.src=MLGO"/></div>
+          <div class="ov-msg" id="ovMsg">&#1575;&#1582;&#1578;&#1585; &#1602;&#1606;&#1575;&#1577; &#1604;&#1604;&#1576;&#1583;&#1569;</div>
+          <div class="ov-sub" id="ovSub">&#1575;&#1587;&#1578;&#1582;&#1583;&#1605; &#1575;&#1604;&#1602;&#1575;&#1574;&#1605;&#1577; &#1575;&#1604;&#1580;&#1575;&#1606;&#1576;&#1610;&#1577; &#1571;&#1608; &#1575;&#1604;&#1588;&#1576;&#1603;&#1577; &#1571;&#1583;&#1606;&#1575;&#1607;</div>
+        </div>
+      </div>
+      <div class="info-bar">
+        <div>
+          <div class="info-name" id="iName">MUS Player</div>
+          <div class="info-sub" id="iSub">&#1575;&#1582;&#1578;&#1585; &#1602;&#1606;&#1575;&#1577;</div>
+        </div>
+        <div class="q-btns" id="qBtns"></div>
+      </div>
+      <div class="err-bar" id="errBar">
+        <span>&#9888; &#1578;&#1593;&#1584;&#1617;&#1585; &#1578;&#1588;&#1594;&#1610;&#1604; &#1575;&#1604;&#1576;&#1579; &#8212; &#1602;&#1583; &#1610;&#1603;&#1608;&#1606; &#1575;&#1604;&#1585;&#1575;&#1576;&#1591; &#1594;&#1610;&#1585; &#1605;&#1578;&#1575;&#1581;</span>
+        <button onclick="retry()">&#8635; &#1573;&#1593;&#1575;&#1583;&#1577; &#1575;&#1604;&#1605;&#1581;&#1575;&#1608;&#1604;&#1577;</button>
+      </div>
+      <div class="grid-sec">
+        <div class="grid-title" id="gTitle">&#1580;&#1605;&#1610;&#1593; &#1575;&#1604;&#1602;&#1606;&#1608;&#1575;&#1578; <span class="gc-cnt" id="gCnt"></span></div>
+        <div class="ch-grid" id="chGrid"></div>
+        <div class="no-res" id="noRes" style="display:none"><div class="ni">&#128249;</div><p>&#1604;&#1575; &#1578;&#1608;&#1580;&#1583; &#1602;&#1606;&#1608;&#1575;&#1578; &#1605;&#1591;&#1575;&#1576;&#1602;&#1577;</p></div>
+      </div>
+    </main>
+  </div>
+  <!-- ADMIN — secret: type مرشادو in search -->
+  <div class="admin-backdrop" id="AB" onclick="bkClk(event)">
+    <div class="admin-box">
+      <div class="admin-head">
+        <h2>&#9881;&#65039; &#1604;&#1608;&#1581;&#1577; &#1575;&#1604;&#1578;&#1581;&#1603;&#1605;</h2>
+        <button class="admin-close" onclick="closeA()">&#10005;</button>
+      </div>
+      <div class="admin-tabs">
+        <div class="atab on" data-tab="stats" onclick="sTab('stats')">&#128200; &#1573;&#1581;&#1589;&#1575;&#1569;</div>
+        <div class="atab" data-tab="add" onclick="sTab('add')">&#43; &#1573;&#1590;&#1575;&#1601;&#1577;</div>
+        <div class="atab" data-tab="list" onclick="sTab('list')">&#128247; &#1575;&#1604;&#1602;&#1606;&#1608;&#1575;&#1578;</div>
+        <div class="atab" data-tab="imp" onclick="sTab('imp')">&#11015; M3U</div>
+        <div class="atab" data-tab="bk" onclick="sTab('bk')">&#128190; &#1606;&#1587;&#1582;&#1577;</div>
+      </div>
+      <div class="admin-body">
+        <div class="sec on" id="tab-stats">
+          <div class="sg" id="stG"></div>
+          <hr class="hr"/>
+          <p style="font-size:13px;color:var(--muted);line-height:1.9">
+            <strong style="color:var(--text)">&#1604;&#1601;&#1578;&#1581; &#1575;&#1604;&#1604;&#1608;&#1581;&#1577;:</strong>
+            &#1575;&#1603;&#1578;&#1576; <strong style="color:var(--gold)">&#1605;&#1585;&#1588;&#1575;&#1583;&#1608;</strong> &#1601;&#1610; &#1582;&#1575;&#1606;&#1577; &#1575;&#1604;&#1576;&#1581;&#1579; &#1579;&#1605; Enter &#8212;
+            &#1578;&#1591;&#1604;&#1602; &#1607;&#1584;&#1607; &#1575;&#1604;&#1604;&#1608;&#1581;&#1577; &#1601;&#1608;&#1585;&#1575;&#1611;.
+          </p>
+        </div>
+        <div class="sec" id="tab-add">
+          <div class="eb" id="editB">&#9998; &#1608;&#1590;&#1593; &#1575;&#1604;&#1578;&#1593;&#1583;&#1610;&#1604;</div>
+          <div class="fg2">
+            <div class="fg"><label class="lbl">&#1575;&#1587;&#1605; &#1573;&#1606;&#1580;&#1604;&#1610;&#1586;&#1610;</label><input id="fN" class="fi" placeholder="beIN Sports 1 HD"/></div>
+            <div class="fg"><label class="lbl">&#1575;&#1587;&#1605; &#1593;&#1585;&#1576;&#1610;</label><input id="fA" class="fi" placeholder="&#1576;&#1610; &#1573;&#1606; 1"/></div>
+            <div class="fg"><label class="lbl">&#1575;&#1604;&#1578;&#1589;&#1606;&#1610;&#1601;</label>
+              <select id="fC" class="fi"><option>Sports</option><option>News</option><option>Movies</option><option>Kids</option><option>4K</option><option>&#1593;&#1575;&#1605;</option></select>
+            </div>
+            <div class="fg"><label class="lbl">&#1575;&#1604;&#1604;&#1608;&#1606;</label><input id="fCl" class="fi" type="color" value="#e63946" style="height:43px;padding:4px;cursor:pointer"/></div>
+            <div class="fg" style="grid-column:1/-1"><label class="lbl">&#1585;&#1575;&#1576;&#1591; &#1575;&#1604;&#1588;&#1593;&#1575;&#1585; (&#1575;&#1582;&#1578;&#1610;&#1575;&#1585;&#1610;)</label><input id="fL" class="fi" placeholder="https://...logo.png" dir="ltr"/></div>
+          </div>
+          <label class="lbl" style="margin-bottom:10px">&#1585;&#1608;&#1575;&#1576;&#1591; &#1575;&#1604;&#1576;&#1579;</label>
+          <div class="sr-list" id="srList">
+            <div class="sr"><input class="fi ql" placeholder="HD" value="HD"/><input class="fi" placeholder="https://...m3u8" dir="ltr"/><button class="del-s" onclick="dSR(this)">&#10005;</button></div>
+          </div>
+          <button class="add-s" onclick="aSR()">&#43; &#1573;&#1590;&#1575;&#1601;&#1577; &#1580;&#1608;&#1583;&#1577; &#1571;&#1582;&#1585;&#1609;</button>
+          <hr class="hr"/>
+          <div class="act-row">
+            <button class="btn-p" onclick="savCh()">&#10003; &#1581;&#1601;&#1592; &#1575;&#1604;&#1602;&#1606;&#1575;&#1577;</button>
+            <button class="btn-s" onclick="rForm()">&#8635; &#1605;&#1587;&#1581;</button>
+          </div>
+        </div>
+        <div class="sec" id="tab-list">
+          <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+            <input id="aS" class="fi" placeholder="&#1576;&#1581;&#1579;..." style="flex:1;min-width:140px" oninput="rAdL(this.value)"/>
+            <button class="btn-s" style="color:var(--accent);border-color:rgba(230,57,70,.3)" onclick="clrAll()">&#128465; &#1581;&#1584;&#1601; &#1575;&#1604;&#1603;&#1604;</button>
+          </div>
+          <div class="acl" id="acl"></div>
+        </div>
+        <div class="sec" id="tab-imp">
+          <div class="fg" style="margin-bottom:14px">
+            <label class="lbl">&#1585;&#1575;&#1576;&#1591; M3U/M3U8</label>
+            <div style="display:flex;gap:8px"><input id="m3uU" class="fi" placeholder="http://..." dir="ltr" style="flex:1"/><button class="btn-p" onclick="impUrl()">&#11015; &#1578;&#1581;&#1605;&#1610;&#1604;</button></div>
+          </div>
+          <hr class="hr"/>
+          <div class="fg"><label class="lbl">&#1571;&#1608; &#1575;&#1604;&#1589;&#1602; &#1605;&#1581;&#1578;&#1608;&#1609; M3U</label>
+            <textarea class="m3ua" id="m3uT" placeholder="#EXTM3U&#10;#EXTINF:-1 group-title=&quot;Sports&quot;,Channel&#10;http://...m3u8"></textarea>
+          </div>
+          <div class="act-row" style="margin-top:10px">
+            <button class="btn-p" onclick="impTxt()">&#43; &#1575;&#1587;&#1578;&#1610;&#1585;&#1575;&#1583;</button>
+            <button class="btn-s" onclick="el('m3uT').value=''">&#8635; &#1605;&#1587;&#1581;</button>
+          </div>
+          <div class="is" id="impSt"></div>
+        </div>
+        <div class="sec" id="tab-bk">
+          <div class="sg" id="bkG"></div>
+          <div class="act-row" style="margin-bottom:16px">
+            <button class="btn-p" onclick="expBk()">&#11015; &#1578;&#1589;&#1583;&#1610;&#1585; JSON</button>
+            <button class="btn-s" onclick="el('bkF').click()">&#11014; &#1575;&#1587;&#1578;&#1610;&#1585;&#1575;&#1583; JSON</button>
+            <input type="file" id="bkF" accept=".json" style="display:none" onchange="impBk(this)"/>
+          </div>
+          <hr class="hr"/>
+          <div class="fg"><label class="lbl">&#1575;&#1587;&#1578;&#1593;&#1575;&#1583;&#1577; &#1605;&#1606; JSON</label>
+            <textarea id="jA" class="m3ua" style="min-height:110px" placeholder='[{"id":1,"name":"..."}]'></textarea>
+          </div>
+          <div class="act-row" style="margin-top:8px"><button class="btn-p" onclick="rJson()">&#8635; &#1575;&#1587;&#1578;&#1593;&#1575;&#1583;&#1577;</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script>
+  'use strict';
+  var TRIG='مرشادو';
+  var MLGO='https://image.qwenlm.ai/public_source/30b33922-da5a-4b70-9ad7-2ab7ac57119e/1972c8aa0-f22d-480f-ac63-45874086aba6.png';
+  var DL='data:image/svg+xml;base64,'+btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#111827"/><text x="50" y="65" font-family="Arial" font-size="48" font-weight="bold" fill="#e63946" text-anchor="middle">M</text></svg>');
+  var BASE=[{id:1,name:'القناة الرئيسية',ar:'بث مباشر',cat:'عام',color:'#e63946',live:true,logo:DL,streams:[{q:'HD',url:'http://164898475139.fug-26.com:80/live/0664002407/o0clgod3en/28938.m3u8'}]}];
+  function lC(){try{var d=localStorage.getItem('mus_v2');if(!d)return null;var c=JSON.parse(d);return Array.isArray(c)&&c.length?c:null;}catch(e){return null;}}
+  function sC(){localStorage.setItem('mus_v2',JSON.stringify(CHS));}
+  function lF(){try{return JSON.parse(localStorage.getItem('mus_fav'))||[];}catch(e){return[];}}
+  function sF(){localStorage.setItem('mus_fav',JSON.stringify(FAVS));}
+  var CHS=lC()||JSON.parse(JSON.stringify(BASE));
+  var FAVS=lF();
+  var aC='all',aCh=null,sI=0,hls=null,fI=-1,eId=null;
+  function el(id){return document.getElementById(id);}
+  var vid=el('vid');
+  function lg(c){return c.logo&&c.logo!=='null'?c.logo:DL;}
+  function shLoad(m){el('overlay').innerHTML='<div class="spinner"></div><div class="ov-msg">'+(m||'جاري تشغيل البث...')+'</div>';el('overlay').classList.remove('gone');}
+  function shIdle(l,m,s){el('overlay').innerHTML='<div class="ov-logo"><img src="'+(l||MLGO)+'" onerror="this.src=MLGO"/></div><div class="ov-msg">'+(m||'اختر قناة')+'</div><div class="ov-sub">'+(s||'')+'</div>';el('overlay').classList.remove('gone');}
+  function hOv(){el('overlay').classList.add('gone');}
+  function dHls(){if(hls){try{hls.destroy();}catch(e){}hls=null;}}
+  function loadS(url){
+    dHls();el('errBar').style.display='none';shLoad();
+    if(typeof Hls!=='undefined'&&Hls.isSupported()){
+      hls=new Hls({enableWorker:true,maxBufferLength:90,maxMaxBufferLength:180});
+      hls.loadSource(url);hls.attachMedia(vid);
+      hls.on(Hls.Events.MANIFEST_PARSED,function(){hOv();vid.play().catch(function(){});});
+      hls.on(Hls.Events.ERROR,function(ev,d){if(d.fatal){shIdle(null,'⚠ تعذّر البث','الرابط غير متاح');el('errBar').style.display='flex';dHls();}});
+    }else if(vid.canPlayType('application/vnd.apple.mpegurl')){
+      vid.src=url;vid.onloadedmetadata=function(){hOv();vid.play().catch(function(){});};
+      vid.onerror=function(){shIdle(null,'خطأ في التشغيل','');el('errBar').style.display='flex';};
+    }else shIdle(null,'المتصفح لا يدعم HLS','');
+  }
+  function retry(){el('errBar').style.display='none';if(aCh)loadS(aCh.streams[sI].url);}
+  function playCh(id,idx){
+    var c=gCh(id);if(!c)return;if(idx===undefined)idx=0;
+    aCh=c;sI=idx;
+    el('iName').textContent=c.name;
+    el('iSub').innerHTML=c.ar+(c.live?' <span class="ld"></span>':'');
+    var h='';for(var s=0;s<c.streams.length;s++)h+='<button class="qb'+(s===idx?' on':'')+'" onclick="playCh('+c.id+','+s+')">'+c.streams[s].q+'</button>';
+    el('qBtns').innerHTML=h;loadS(c.streams[idx].url);render();
+  }
+  function gCh(id){for(var i=0;i<CHS.length;i++)if(CHS[i].id===id)return CHS[i];return null;}
+  function tFavI(id,e){if(e)e.stopPropagation();var i=FAVS.indexOf(id);if(i>-1){FAVS.splice(i,1);toast('أزيلت من المفضلة');}else{FAVS.push(id);toast('★ أضيفت للمفضلة','ok');}sF();render();}
+  function tFav(){aC=aC==='fav'?'all':'fav';el('btnFav').classList.toggle('on',aC==='fav');render();}
+  function tSB(){el('sidebar').classList.toggle('closed');el('btnSB').classList.toggle('on',!el('sidebar').classList.contains('closed'));}
+  function filt(){var q=el('sq').value.trim().toLowerCase();var l=[];for(var i=0;i<CHS.length;i++){var c=CHS[i];if(aC==='fav'&&FAVS.indexOf(c.id)===-1)continue;if(aC!=='all'&&aC!=='fav'&&c.cat!==c.cat)continue;if(aC!=='all'&&aC!=='fav'&&c.cat!==aC)continue;if(q&&c.name.toLowerCase().indexOf(q)===-1&&c.ar.indexOf(q)===-1)continue;l.push(c);}return l;}
+  function render(){
+    var list=filt();
+    var cats=[{id:'all',label:'الكل'},{id:'fav',label:'★ مفضلة'}];
+    var seen={};for(var i=0;i<CHS.length;i++){if(!seen[CHS[i].cat]){seen[CHS[i].cat]=1;cats.push({id:CHS[i].cat,label:CHS[i].cat});}}
+    el('catRow').innerHTML=cats.map(function(c){return'<button class="cat'+(aC===c.id?' on':'')+'" onclick="setC(''+c.id+'')">'+c.label+'</button>';}).join('');
+    el('chList').innerHTML=list.length?list.map(function(c,i){var p=aCh&&aCh.id===c.id;var f=FAVS.indexOf(c.id)>-1;var q0=c.streams[0].q;
+      return'<div class="ch-item'+(p?' playing':'')+(i===fI?' focused':'')+'" data-id="'+c.id+'" tabindex="-1" onclick="playCh('+c.id+')">'
+        +'<div class="ch-thumb"><img src="'+lg(c)+'" onerror="this.src=DL"/></div>'
+        +'<div class="ch-info"><div class="name">'+c.name+'</div><div class="sub">'+c.ar+'</div></div>'
+        +(c.live?'<span class="badge b-live">LIVE</span>':'')
+        +(q0==='4K'?'<span class="badge b-4k">4K</span>':q0==='HD'?'<span class="badge b-hd">HD</span>':'')
+        +'<button class="fav'+(f?' on':'')+'" onclick="tFavI('+c.id+',event)">'+(f?'&#9733;':'&#9734;')+'</button></div>';
+    }).join(''):'<div class="no-res"><div class="ni">&#128249;</div><p>لا توجد قنوات</p></div>';
+    el('chGrid').innerHTML=list.map(function(c){return'<div class="gc" tabindex="0" onclick="playCh('+c.id+')" onkeydown="if(event.key==='Enter')playCh('+c.id+')">'+'<div class="gc-logo"><img src="'+lg(c)+'" onerror="this.src=DL"/></div>'+'<div class="gc-name">'+c.name+'</div><div class="gc-sub">'+c.ar+'</div></div>';}).join('');
+    el('noRes').style.display=list.length?'none':'block';el('gCnt').textContent='('+list.length+')';
+  }
+  function setC(id){aC=id;render();}
+  el('sq').addEventListener('input',function(){if(this.value===TRIG){this.value='';openA();return;}render();});
+  document.addEventListener('keydown',function(e){
+    if(el('AB').classList.contains('open'))return;
+    var items=document.querySelectorAll('.ch-item');
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();if(el('sidebar').classList.contains('closed'))el('sidebar').classList.remove('closed');fI=e.key==='ArrowDown'?Math.min(fI+1,items.length-1):Math.max(fI-1,0);render();var it=items[fI];if(it){it.focus();it.scrollIntoView({behavior:'smooth',block:'nearest'});}return;}
+    if(e.key==='Enter'&&fI>=0&&items[fI]){e.preventDefault();playCh(parseInt(items[fI].getAttribute('data-id')));return;}
+    if((e.key==='ArrowLeft'||e.key==='ArrowRight')&&aCh){e.preventDefault();var ni=sI+(e.key==='ArrowLeft'?1:-1);if(ni>=0&&ni<aCh.streams.length)playCh(aCh.id,ni);return;}
+    if(e.key===' '||e.key==='MediaPlayPause'){e.preventDefault();vid.paused?vid.play():vid.pause();return;}
+    if(e.key==='Escape'||e.key==='Backspace'){e.preventDefault();if(aCh){aCh=null;dHls();shIdle(null,'اختر قناة','');render();}return;}
+    if(e.key==='AudioVolumeUp'||e.key==='VolumeUp'){e.preventDefault();vid.volume=Math.min(vid.volume+.1,1);toast('صوت '+Math.round(vid.volume*100)+'%');return;}
+    if(e.key==='AudioVolumeDown'||e.key==='VolumeDown'){e.preventDefault();vid.volume=Math.max(vid.volume-.1,0);toast('صوت '+Math.round(vid.volume*100)+'%');return;}
+    if(e.key==='AudioVolumeMute'||e.key==='VolumeMute'){e.preventDefault();vid.muted=!vid.muted;toast(vid.muted?'صامت':'صوت مفعل');return;}
+  });
+  var _t;
+  function toast(m,tp){var t=el('toast');t.innerHTML=m;t.className='toast show'+(tp?' '+tp:'');clearTimeout(_t);_t=setTimeout(function(){t.className='toast';},2800);}
+  function openA(){el('AB').classList.add('open');updSt();rAdL();}
+  function closeA(){el('AB').classList.remove('open');}
+  function bkClk(e){if(e.target===el('AB'))closeA();}
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&el('AB').classList.contains('open')){e.stopPropagation();closeA();}},true);
+  function sTab(id){document.querySelectorAll('.atab').forEach(function(t){t.classList.toggle('on',t.dataset.tab===id);});document.querySelectorAll('.sec').forEach(function(s){s.classList.toggle('on',s.id==='tab-'+id);});if(id==='list')rAdL();if(id==='stats')updSt();if(id==='bk')updBk();}
+  function updSt(){var cats={};CHS.forEach(function(c){cats[c.cat]=(cats[c.cat]||0)+1;});el('stG').innerHTML='<div class="sc"><div class="v">'+CHS.length+'</div><div class="l">إجمالي</div></div>'+'<div class="sc"><div class="v">'+FAVS.length+'</div><div class="l">مفضلة</div></div>'+'<div class="sc"><div class="v">'+Object.keys(cats).length+'</div><div class="l">تصنيفات</div></div>'+'<div class="sc"><div class="v">'+(aCh?'&#9654;':'&#9644;')+'</div><div class="l">الحالة</div></div>';}
+  function updBk(){el('bkG').innerHTML='<div class="sc"><div class="v">'+CHS.length+'</div><div class="l">قناة محفوظة</div></div>';}
+  function aSR(){var r=document.createElement('div');r.className='sr';r.innerHTML='<input class="fi ql" placeholder="HD" value="HD"/><input class="fi" placeholder="https://...m3u8" dir="ltr"/><button class="del-s" onclick="dSR(this)">&#10005;</button>';el('srList').appendChild(r);}
+  function dSR(b){var rows=el('srList').querySelectorAll('.sr');if(rows.length>1)b.parentElement.remove();else toast('يجب الإبقاء على رابط واحد','err');}
+  function rForm(){el('fN').value='';el('fA').value='';el('fC').value='عام';el('fCl').value='#e63946';el('fL').value='';el('srList').innerHTML='<div class="sr"><input class="fi ql" placeholder="HD" value="HD"/><input class="fi" placeholder="https://...m3u8" dir="ltr"/><button class="del-s" onclick="dSR(this)">&#10005;</button></div>';eId=null;el('editB').classList.remove('show');}
+  function savCh(){
+    var name=el('fN').value.trim(),ar=el('fA').value.trim();
+    if(!name||!ar){toast('أدخل اسم القناة','err');return;}
+    var streams=[];el('srList').querySelectorAll('.sr').forEach(function(r){var ins=r.querySelectorAll('input');var q=ins[0].value.trim(),url=ins[1].value.trim();if(q&&url)streams.push({q:q,url:url});});
+    if(!streams.length){toast('أضف رابط بث واحد','err');return;}
+    var ch={id:eId||Date.now(),name:name,ar:ar,cat:el('fC').value,color:el('fCl').value,live:true,logo:el('fL').value.trim()||DL,streams:streams};
+    if(eId){for(var i=0;i<CHS.length;i++)if(CHS[i].id===eId){CHS[i]=ch;break;}toast('✓ تم التعديل','ok');}
+    else{CHS.push(ch);toast('✓ تمت الإضافة','ok');}
+    sC();rForm();render();sTab('list');
+  }
+  function edCh(id){var c=gCh(id);if(!c)return;eId=id;el('fN').value=c.name;el('fA').value=c.ar;el('fC').value=c.cat;el('fCl').value=c.color||'#e63946';el('fL').value=c.logo===DL?'':c.logo;el('srList').innerHTML=c.streams.map(function(s){return'<div class="sr"><input class="fi ql" value="'+s.q+'"/><input class="fi" value="'+s.url+'" dir="ltr"/><button class="del-s" onclick="dSR(this)">&#10005;</button></div>';}).join('');el('editB').classList.add('show');sTab('add');}
+  function delCh(id){if(!confirm('تأكيد حذف هذه القناة؟'))return;CHS=CHS.filter(function(c){return c.id!==id;});if(aCh&&aCh.id===id){aCh=null;dHls();shIdle(null,'اختر قناة','');}sC();render();rAdL();toast('تم الحذف');}
+  function clrAll(){if(!confirm('حذف جميع القنوات؟
+لا يمكن التراجع!'))return;CHS=[];aCh=null;dHls();shIdle(null,'اختر قناة','');sC();render();rAdL();toast('تم حذف الكل');}
+  function rAdL(q){var list=q?CHS.filter(function(c){return c.name.toLowerCase().indexOf(q.toLowerCase())>-1||c.ar.indexOf(q)>-1;}):CHS;el('acl').innerHTML=list.length?list.map(function(c){return'<div class="ach"><div class="ath"><img src="'+lg(c)+'" onerror="this.src=DL"/></div><div class="an"><strong>'+c.name+'</strong><small>'+c.ar+' · '+c.cat+' · '+c.streams.length+' رابط</small></div><div class="aa"><button class="be" onclick="edCh('+c.id+')">&#9998; تعديل</button><button class="bd" onclick="delCh('+c.id+')">&#128465; حذف</button></div></div>';}).join(''):'<div class="no-res"><div class="ni">&#128249;</div><p>لا توجد قنوات</p></div>';}
+  function pM3U(txt){var lines=txt.split('
+'),chs=[],cur=null;for(var i=0;i<lines.length;i++){var l=lines[i].trim();if(l.indexOf('#EXTINF')===0){var name=l.indexOf(',')>-1?l.split(',').slice(1).join(',').trim():'قناة';var lgo='',cat='عام',ar=name,m;if(m=l.match(/tvg-logo="([^"]+)"/))lgo=m[1];if(m=l.match(/group-title="([^"]+)"/))cat=m[1];if(m=l.match(/tvg-name="([^"]+)"/))ar=m[1];cur={id:Date.now()+Math.random()*1e6,name:name,ar:ar,cat:cat,color:'#e63946',live:true,logo:lgo||DL,streams:[]};}else if(l&&l.indexOf('#')!==0&&cur){cur.streams.push({q:'SD',url:l});chs.push(cur);cur=null;}}return chs;}
+  function impUrl(){var url=el('m3uU').value.trim();if(!url){toast('أدخل رابط M3U','err');return;}toast('جاري التحميل...');fetch(url).then(function(r){return r.text();}).then(function(t){var c=pM3U(t);if(!c.length){shImpSt('لم يُعثر على قنوات','err');return;}CHS=CHS.concat(c);sC();render();shImpSt('✓ تم استيراد '+c.length+' قناة بنجاح','ok');updSt();}).catch(function(e){shImpSt('خطأ: '+e.message,'err');});}
+  function impTxt(){var t=el('m3uT').value.trim();if(!t){toast('الصق M3U','err');return;}var c=pM3U(t);if(!c.length){shImpSt('لم يُعثر على قنوات','err');return;}CHS=CHS.concat(c);sC();render();shImpSt('✓ تم استيراد '+c.length+' قناة','ok');el('m3uT').value='';updSt();}
+  function shImpSt(m,tp){var s=el('impSt');s.innerHTML=m;s.className='is '+tp;setTimeout(function(){s.className='is';},5000);}
+  function expBk(){var j=JSON.stringify({version:2,date:new Date().toISOString(),channels:CHS},null,2);var b=new Blob([j],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='mus-backup-'+Date.now()+'.json';a.click();toast('✓ تم التصدير','ok');}
+  function impBk(inp){var f=inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(e){try{var d=JSON.parse(e.target.result);var c=d.channels||d;if(!Array.isArray(c))throw new Error('تنسيق غير صحيح');CHS=c;sC();render();rAdL();updBk();toast('✓ تمت الاستعادة ('+c.length+' قناة)','ok');}catch(ex){toast('خطأ: '+ex.message,'err');}};r.readAsText(f);inp.value='';}
+  function rJson(){var t=el('jA').value.trim();if(!t){toast('الصق JSON','err');return;}try{var d=JSON.parse(t);var c=d.channels||d;if(!Array.isArray(c))throw new Error('تنسيق غير صحيح');CHS=c;sC();render();rAdL();toast('✓ تمت الاستعادة ('+c.length+' قناة)','ok');el('jA').value='';}catch(ex){toast('خطأ: '+ex.message,'err');}}
+  shIdle(MLGO,'MUS Player','اختر قناة للبدء');render();
+  if(window.innerWidth>=1024)el('sidebar').classList.remove('closed');
+  </script>
+  </body>
+  </html>
