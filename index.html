@@ -7,6 +7,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
     <title>MUS Player</title>
+    <link rel="manifest" href="manifest.json"/>
+    <meta name="mobile-web-app-capable" content="yes"/>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js"></script>
     <style>
       *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -273,17 +275,34 @@
   function hOv(){el('overlay').classList.add('gone');}
   function dHls(){if(hls){try{hls.destroy();}catch(e){}hls=null;}}
   function loadS(url){
-    dHls();el('errBar').style.display='none';shLoad();
-    if(typeof Hls!=='undefined'&&Hls.isSupported()){
-      hls=new Hls({enableWorker:true,maxBufferLength:90,maxMaxBufferLength:180});
-      hls.loadSource(url);hls.attachMedia(vid);
-      hls.on(Hls.Events.MANIFEST_PARSED,function(){hOv();vid.play().catch(function(){});});
-      hls.on(Hls.Events.ERROR,function(ev,d){if(d.fatal){shIdle(null,'⚠ تعذّر البث','الرابط غير متاح');el('errBar').style.display='flex';dHls();}});
-    }else if(vid.canPlayType('application/vnd.apple.mpegurl')){
-      vid.src=url;vid.onloadedmetadata=function(){hOv();vid.play().catch(function(){});};
-      vid.onerror=function(){shIdle(null,'خطأ في التشغيل','');el('errBar').style.display='flex';};
-    }else shIdle(null,'المتصفح لا يدعم HLS','');
-  }
+      dHls();el('errBar').style.display='none';shLoad();
+      /* upgrade http→https when page is served over https (mixed-content fix) */
+      var secUrl=(location.protocol==='https:'&&url.indexOf('http://')===0)?'https://'+url.slice(7):url;
+      function tryNative(u){
+        vid.src=u;
+        vid.onloadedmetadata=function(){hOv();vid.play().catch(function(){});};
+        vid.onerror=function(){
+          /* if upgraded URL failed, retry with original http */
+          if(u!==url){vid.src=url;return;}
+          shIdle(null,'⚠ تعذّر البث','الرابط غير متاح');el('errBar').style.display='flex';
+        };
+      }
+      if(typeof Hls!=='undefined'&&Hls.isSupported()){
+        hls=new Hls({enableWorker:true,maxBufferLength:90,maxMaxBufferLength:180,
+          xhrSetup:function(xhr){xhr.withCredentials=false;}});
+        hls.loadSource(secUrl);hls.attachMedia(vid);
+        hls.on(Hls.Events.MANIFEST_PARSED,function(){hOv();vid.play().catch(function(){});});
+        hls.on(Hls.Events.ERROR,function(ev,d){
+          if(d.fatal){
+            dHls();
+            /* HLS.js failed (likely mixed-content) — fall back to native <video> */
+            tryNative(secUrl!==url?url:url);
+          }
+        });
+      }else if(vid.canPlayType('application/vnd.apple.mpegurl')){
+        tryNative(secUrl);
+      }else shIdle(null,'المتصفح لا يدعم HLS','');
+    }
   function retry(){el('errBar').style.display='none';if(aCh)loadS(aCh.streams[sI].url);}
   function playCh(id,idx){
     var c=gCh(id);if(!c)return;if(idx===undefined)idx=0;
@@ -366,5 +385,11 @@
   shIdle(MLGO,'MUS Player','اختر قناة للبدء');render();
   if(window.innerWidth>=1024)el('sidebar').classList.remove('closed');
   </script>
+  
+    <script>
+      if('serviceWorker' in navigator){
+        navigator.serviceWorker.register('sw.js').catch(function(){});
+      }
+    </script>
   </body>
   </html>
