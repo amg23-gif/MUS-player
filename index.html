@@ -318,7 +318,7 @@
     if(sp) sp.parentNode.removeChild(sp);
     ov.classList.remove('gone');
     var el=document.getElementById('ovLogo');
-    if(logo){ el.innerHTML='<img src="'+escHtml(logo)+'" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'"/>'; }
+    if(logo){ el.innerHTML='<img src="'+escHtml(logo)+'" style="width:100%;height:100%;object-fit:cover" onerror="imgErr(this)"/>'; }
     else { el.innerHTML='▶'; }
     document.getElementById('ovTitle').textContent = title||'MUS Player';
     document.getElementById('ovSub').textContent   = sub||'اختر قناة للبدء';
@@ -332,7 +332,7 @@
     document.getElementById('ovTitle').textContent = ch ? ch.name : 'جاري التحميل...';
     document.getElementById('ovSub').textContent   = 'يتصل بالخادم...';
     var el=document.getElementById('ovLogo');
-    if(ch && ch.logo){ el.innerHTML='<img src="'+escHtml(ch.logo)+'" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'"/>'; }
+    if(ch && ch.logo){ el.innerHTML='<img src="'+escHtml(ch.logo)+'" style="width:100%;height:100%;object-fit:cover" onerror="imgErr(this)"/>'; }
     else { el.innerHTML='▶'; }
   }
 
