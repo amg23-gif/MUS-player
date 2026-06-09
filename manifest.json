@@ -15,24 +15,14 @@
   ],
   "icons": [
     {
-      "src": "https://image.qwenlm.ai/public_source/30b33922-da5a-4c21-b1ec-68e7b2da8f4a",
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjMyIiBmaWxsPSIjMDcwOTBmIi8+PHJlY3QgeD0iOCIgeT0iOCIgd2lkdGg9IjE3NiIgaGVpZ2h0PSIxNzYiIHJ4PSIyOCIgZmlsbD0iIzBjMTAyMCIvPjxwb2x5Z29uIHBvaW50cz0iNzIsNTIgNzIsMTQwIDE0OCw5NiIgZmlsbD0iI2U2Mzk0NiIvPjx0ZXh0IHg9Ijk2IiB5PSIxODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iI2Y1OWUwYiI+TVVTPC90ZXh0Pjwvc3ZnPg==",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/svg+xml"
     },
     {
-      "src": "https://image.qwenlm.ai/public_source/30b33922-da5a-4c21-b1ec-68e7b2da8f4a",
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjMyIiBmaWxsPSIjMDcwOTBmIi8+PHJlY3QgeD0iOCIgeT0iOCIgd2lkdGg9IjE3NiIgaGVpZ2h0PSIxNzYiIHJ4PSIyOCIgZmlsbD0iIzBjMTAyMCIvPjxwb2x5Z29uIHBvaW50cz0iNzIsNTIgNzIsMTQwIDE0OCw5NiIgZmlsbD0iI2U2Mzk0NiIvPjx0ZXh0IHg9Ijk2IiB5PSIxODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iI2Y1OWUwYiI+TVVTPC90ZXh0Pjwvc3ZnPg==",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "https://image.qwenlm.ai/public_source/30b33922-da5a-4c21-b1ec-68e7b2da8f4a",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide"
+      "type": "image/svg+xml"
     }
   ],
   "prefer_related_applications": false
