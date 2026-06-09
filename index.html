@@ -351,7 +351,7 @@
       ? '⚠ البث محجوب (HTTP على HTTPS) — استخدم VLC أو المتصفح مباشرةً'
       : '⚠ ' + msg + ' — الرابط غير متاح حالياً';
     var vlc=document.getElementById('vlcLink');
-    vlc.href = 'vlc://' + url.replace(/^https?:///,'');
+    vlc.href = 'vlc://' + url.replace(/^https?:\/\//,'');
     vlc.style.display = '';
   }
 
