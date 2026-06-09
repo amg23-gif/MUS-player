@@ -355,76 +355,79 @@
     vlc.style.display = '';
   }
 
-  function loadStream(url, ch){
-    destroyHls();
-    document.getElementById('errBar').style.display='none';
-    showLoading(ch);
+  // Proxy loader: wraps every HLS.js request so http:// streams go via corsproxy.io on https: pages
+    function createProxyLoader(BaseLoader){
+      function ProxyLoader(cfg){ BaseLoader.call(this,cfg); }
+      ProxyLoader.prototype = Object.create(BaseLoader.prototype);
+      ProxyLoader.prototype.constructor = ProxyLoader;
+      var origLoad = BaseLoader.prototype.load;
+      ProxyLoader.prototype.load = function(ctx, cfg, cbs){
+        if(ctx.url && ctx.url.indexOf('http://')===0){
+          ctx.url = 'https://corsproxy.io/?' + encodeURIComponent(ctx.url);
+        }
+        origLoad.call(this, ctx, cfg, cbs);
+      };
+      return ProxyLoader;
+    }
 
-    // Attempt order:
-    // 1. Native HLS (iOS / tvOS / some Android TV browsers) — try https upgrade first
-    // 2. HLS.js (desktop Chrome, Android Chrome)
-    // 3. Show error with VLC link
+    function loadStream(url, ch){
+      destroyHls();
+      document.getElementById('errBar').style.display='none';
+      showLoading(ch);
 
-    var httpsUrl = (url.indexOf('http://')===0) ? url.replace('http://','https://') : url;
+      var isHttp  = url.indexOf('http://')===0;
+      var useProxy = isHttp && location.protocol==='https:';
+      var httpsUrl = isHttp ? url.replace('http://','https://') : url;
+      // proxy loader gets original http:// URL — it adds the prefix itself
+      var playUrl  = useProxy ? url : httpsUrl;
 
-    if(vid.canPlayType('application/vnd.apple.mpegurl')){
-      // Native HLS — try https version
-      vid.src = httpsUrl;
+      if(vid.canPlayType('application/vnd.apple.mpegurl')){
+        vid.src = httpsUrl;
+        vid.load();
+        vid.oncanplay = function(){ hideOverlay(); vid.play().catch(function(){}); };
+        vid.onerror   = function(){
+          if(vid.src !== url){ vid.src=url; vid.load(); return; }
+          showErr(url, ch, 'خطأ في التشغيل');
+        };
+        return;
+      }
+
+      if(typeof Hls !== 'undefined' && Hls.isSupported()){
+        hlsObj = new Hls({
+          enableWorker: true,
+          maxBufferLength: 60,
+          maxMaxBufferLength: 120,
+          xhrSetup: function(xhr){ xhr.withCredentials = false; },
+          loader: useProxy ? createProxyLoader(Hls.DefaultConfig.loader) : Hls.DefaultConfig.loader
+        });
+
+        hlsObj.on(Hls.Events.MANIFEST_PARSED, function(){
+          hideOverlay();
+          vid.play().catch(function(){});
+        });
+
+        hlsObj.on(Hls.Events.ERROR, function(event, data){
+          if(data.fatal){
+            var savedCh = ch;
+            destroyHls();
+            if(data.type === Hls.ErrorTypes.NETWORK_ERROR){
+              showErr(url, savedCh, 'خطأ في الشبكة — تحقق من الرابط');
+            } else {
+              showErr(url, savedCh, 'خطأ في البث');
+            }
+          }
+        });
+
+        hlsObj.loadSource(playUrl);
+        hlsObj.attachMedia(vid);
+        return;
+      }
+
+      vid.src = url;
       vid.load();
       vid.oncanplay = function(){ hideOverlay(); vid.play().catch(function(){}); };
-      vid.onerror   = function(){
-        // Fall back to http
-        if(vid.src !== url){ vid.src=url; vid.load(); return; }
-        showErr(url, ch, 'خطأ في التشغيل');
-      };
-      return;
+      vid.onerror   = function(){ showErr(url, ch, 'المتصفح لا يدعم هذا البث'); };
     }
-
-    if(typeof Hls !== 'undefined' && Hls.isSupported()){
-      hlsObj = new Hls({
-        enableWorker: true,
-        maxBufferLength: 60,
-        maxMaxBufferLength: 120,
-        xhrSetup: function(xhr){ xhr.withCredentials = false; }
-      });
-
-      hlsObj.on(Hls.Events.MANIFEST_PARSED, function(){
-        hideOverlay();
-        vid.play().catch(function(){});
-      });
-
-      hlsObj.on(Hls.Events.ERROR, function(event, data){
-        if(data.fatal){
-          destroyHls();
-          if(data.type === Hls.ErrorTypes.NETWORK_ERROR){
-            // Try http version if we were on https
-            if(hlsObj === null && httpsUrl !== url){
-              // Already destroyed — retry with http via native video
-              vid.src = url;
-              vid.load();
-              vid.oncanplay = function(){ hideOverlay(); vid.play().catch(function(){}); };
-              vid.onerror   = function(){ showErr(url,ch,'خطأ في الشبكة'); };
-            } else {
-              showErr(url, ch, 'خطأ في الشبكة');
-            }
-          } else {
-            showErr(url, ch, 'خطأ في البث');
-          }
-        }
-      });
-
-      hlsObj.loadSource(httpsUrl);
-      hlsObj.attachMedia(vid);
-      return;
-    }
-
-    // Last resort
-    vid.src = url;
-    vid.load();
-    vid.oncanplay = function(){ hideOverlay(); vid.play().catch(function(){}); };
-    vid.onerror   = function(){ showErr(url, ch, 'المتصفح لا يدعم هذا البث'); };
-  }
-
   function retryCurrent(){ if(aCh) playCh(aCh.id, aIdx); }
 
   // ─── Play ───
@@ -473,50 +476,84 @@
     return list;
   }
 
-  function render(){
-    var list = getList();
+  var PGSIZE = 120;
+    var _renderList = [];
+    var _gdOffset = 0;
 
-    // ── Sidebar ──
-    var sb='';
-    list.forEach(function(c){
+    function buildChItem(c){
       var isFav = FAVS.indexOf(c.id)>-1;
       var isAct = aCh && aCh.id===c.id;
       var q     = c.streams&&c.streams.length ? c.streams[0].q : '';
-      sb += '<div class="ch-item'+(isAct?' active':'')+'" data-id="'+c.id+'" onclick="playCh('+c.id+')" tabindex="0">';
-      sb += '<div class="ch-thumb">'+makeLogo(c.logo)+'</div>';
-      sb += '<div class="ch-info">';
-      sb += '<div class="ch-name">'+escHtml(c.name)+'</div>';
-      sb += '<div class="ch-sub">'+escHtml(c.cat);
-      if(c.live)            sb += ' <span class="bdg b-live">LIVE</span>';
-      if(q==='HD')          sb += ' <span class="bdg b-hd">HD</span>';
-      else if(q==='4K')     sb += ' <span class="bdg b-4k">4K</span>';
-      sb += '</div></div>';
-      sb += '<button class="fav-btn'+(isFav?' on':'')+'" onclick="event.stopPropagation();toggleFav('+c.id+')">'+(isFav?'★':'☆')+'</button>';
-      sb += '</div>';
-    });
-    document.getElementById('chList').innerHTML = sb;
+      var s = '<div class="ch-item'+(isAct?' active':'')+'" data-id="'+c.id+'" onclick="playCh('+c.id+')" tabindex="0">';
+      s += '<div class="ch-thumb">'+makeLogo(c.logo)+'</div>';
+      s += '<div class="ch-info"><div class="ch-name">'+escHtml(c.name)+'</div>';
+      s += '<div class="ch-sub">'+escHtml(c.cat);
+      if(c.live)        s += ' <span class="bdg b-live">LIVE</span>';
+      if(q==='HD')      s += ' <span class="bdg b-hd">HD</span>';
+      else if(q==='4K') s += ' <span class="bdg b-4k">4K</span>';
+      s += '</div></div>';
+      s += '<button class="fav-btn'+(isFav?' on':'')+'" onclick="event.stopPropagation();toggleFav('+c.id+')">'+(isFav?'★':'☆')+'</button>';
+      s += '</div>';
+      return s;
+    }
 
-    // ── Grid ──
-    var gh='';
-    list.forEach(function(c){
-      gh += '<div class="gc" onclick="playCh('+c.id+')" tabindex="0">';
-      gh += '<div class="gc-logo">'+makeLogo(c.logo, 60)+'</div>';
-      gh += '<div class="gc-name">'+escHtml(c.name)+'</div>';
-      gh += '<div class="gc-sub">'+escHtml(c.cat)+'</div>';
-      gh += '</div>';
-    });
-    document.getElementById('chGrid').innerHTML = gh;
-    document.getElementById('noRes').style.display  = list.length ? 'none' : 'block';
-    document.getElementById('gCnt').textContent       = '('+list.length+')';
+    function renderGridPage(list, offset){
+      var chunk = list.slice(offset, offset + PGSIZE);
+      var gh = '';
+      chunk.forEach(function(c){
+        gh += '<div class="gc" onclick="playCh('+c.id+')" tabindex="0">';
+        gh += '<div class="gc-logo">'+makeLogo(c.logo,60)+'</div>';
+        gh += '<div class="gc-name">'+escHtml(c.name)+'</div>';
+        gh += '<div class="gc-sub">'+escHtml(c.cat)+'</div>';
+        gh += '</div>';
+      });
+      if(offset===0) document.getElementById('chGrid').innerHTML = gh;
+      else document.getElementById('chGrid').insertAdjacentHTML('beforeend', gh);
+      var old=document.getElementById('loadMoreSentinel');
+      if(old) old.parentNode.removeChild(old);
+      if(offset + PGSIZE < list.length){
+        var sentinel=document.createElement('div');
+        sentinel.id='loadMoreSentinel';
+        sentinel.style.cssText='text-align:center;padding:20px;grid-column:1/-1';
+        sentinel.innerHTML='<button class="btn-s" onclick="loadMoreGrid()" style="min-width:160px">+ تحميل المزيد ('+(list.length-offset-PGSIZE)+' قناة)</button>';
+        document.getElementById('chGrid').appendChild(sentinel);
+      }
+    }
 
-    // ── Cats ──
-    var cats=['الكل'];
-    CHS.forEach(function(c){ if(cats.indexOf(c.cat)<0) cats.push(c.cat); });
-    document.getElementById('cats').innerHTML = cats.map(function(c){
-      return '<div class="cat'+(aCat===c?' on':'')+'" onclick="setCat(\''+escHtml(c)+'\')" >'+escHtml(c)+'</div>';
-    }).join('');
-  }
+    function loadMoreGrid(){ _gdOffset+=PGSIZE; renderGridPage(_renderList,_gdOffset); }
 
+    function render(){
+      _renderList = getList();
+      var list = _renderList;
+
+      // ── Sidebar: chunked async so UI stays responsive ──
+      var sbEl = document.getElementById('chList');
+      sbEl.innerHTML = '';
+      var sbIdx = 0;
+      var SBCHUNK = 60;
+      function renderSbChunk(){
+        var frag = '';
+        var end = Math.min(sbIdx + SBCHUNK, list.length);
+        for(var i=sbIdx;i<end;i++) frag += buildChItem(list[i]);
+        sbEl.insertAdjacentHTML('beforeend', frag);
+        sbIdx = end;
+        if(sbIdx < list.length) setTimeout(renderSbChunk, 0);
+      }
+      renderSbChunk();
+
+      // ── Grid: first page only ──
+      _gdOffset = 0;
+      renderGridPage(list, 0);
+      document.getElementById('noRes').style.display = list.length ? 'none' : 'block';
+      document.getElementById('gCnt').textContent    = '('+list.length+')';
+
+      // ── Cats ──
+      var cats=['الكل'];
+      CHS.forEach(function(c){ if(cats.indexOf(c.cat)<0) cats.push(c.cat); });
+      document.getElementById('cats').innerHTML = cats.map(function(c){
+        return '<div class="cat'+(aCat===c?' on':'') + '" onclick="setCat(\'' + escHtml(c) + '\')">' + escHtml(c) + '</div>';
+      }).join('');
+    }
   function setCat(c){ aCat=c; focRow=-1; render(); }
   function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('closed'); }
   function toggleFavView(){
