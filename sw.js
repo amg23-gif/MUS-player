@@ -1,4 +1,4 @@
-const CACHE='mus-v6';
+const CACHE='mus-v7';
   const SHELL=['/MUS-player/','/MUS-player/index.html','/MUS-player/manifest.json'];
   self.addEventListener('install',e=>{
     e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting()));
