@@ -14,7 +14,7 @@
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%;background:var(--bg);color:var(--text);font-family:Tahoma,'Segoe UI',Arial,sans-serif;overflow:hidden;user-select:none}
 
-  /* ── Header ── */
+  /* Header */
   .hdr{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--border);height:52px;position:relative;z-index:50}
   .hdr-logo{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-right:auto}
   .hdr-icon{width:34px;height:34px;background:var(--acc);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900}
@@ -26,10 +26,10 @@
   .ibtn{width:36px;height:36px;min-width:36px;background:none;border:none;color:var(--text);cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;transition:background .15s;flex-shrink:0}
   .ibtn:hover,.ibtn.on{background:var(--bg3)}
 
-  /* ── Layout ── */
+  /* Layout */
   .layout{display:flex;height:calc(100dvh - 52px);overflow:hidden}
 
-  /* ── Sidebar ── */
+  /* Sidebar */
   .sidebar{width:240px;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;transition:width .2s ease}
   .sidebar.closed{width:0;border:none}
   .cats{display:flex;flex-wrap:wrap;gap:4px;padding:8px;border-bottom:1px solid var(--border);flex-shrink:0}
@@ -51,47 +51,37 @@
   .fav-star.on{color:#fbbf24}
   .sb-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:12px;gap:8px;text-align:center;padding:14px}
 
-  /* ── Main ── */
+  /* Main */
   .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 
-  /* ── Player ── */
-  .player-wrap{position:relative;width:100%;background:#000;flex-shrink:0}
-  .player-wrap{aspect-ratio:16/9;max-height:52vh}
+  /* Player */
+  .player-wrap{position:relative;width:100%;background:#000;flex-shrink:0;aspect-ratio:16/9;max-height:52vh}
   #vid{width:100%;height:100%;display:block;background:#000;outline:none}
 
-  /* ── Overlay ── */
-  .ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(4,6,12,.95);z-index:20;gap:8px;padding:10px;text-align:center;transition:opacity .2s}
+  /* Overlay */
+  .ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(4,6,12,.92);z-index:20;gap:8px;padding:10px;text-align:center;transition:opacity .2s}
   .ov.gone{opacity:0;pointer-events:none}
   .ov-spin{width:34px;height:34px;border:3px solid var(--bg3);border-top-color:var(--acc);border-radius:50%;animation:sp .7s linear infinite;flex-shrink:0}
   @keyframes sp{to{transform:rotate(360deg)}}
   .ov-title{font-size:17px;font-weight:700;max-width:100%}
   .ov-sub{font-size:12px;color:var(--muted);max-width:240px;line-height:1.5}
 
-  /* ── HTTP Stream Panel (replaces simple error) ── */
-  .http-panel{display:none;flex-direction:column;gap:0;background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0}
-  .http-panel.open{display:flex}
-  .http-top{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#120a02;border-bottom:1px solid #3a1800}
-  .http-icon{font-size:20px;flex-shrink:0}
-  .http-msg{flex:1;font-size:13px;color:#ffaa55;line-height:1.4}
-  .http-actions{display:flex;gap:8px;padding:10px 14px;flex-wrap:wrap}
-  .btn-vlc{display:flex;align-items:center;gap:6px;background:#e65c00;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;flex:1;justify-content:center;min-width:120px}
-  .btn-vlc:hover{background:#ff6a00}
-  .btn-vlc .vlc-logo{font-size:18px}
-  .btn-cp{background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:13px;cursor:pointer}
-  .btn-chrome{background:transparent;color:var(--acc);border:1px solid var(--acc);border-radius:8px;padding:9px 14px;font-size:12px;cursor:pointer;white-space:nowrap}
-  .chrome-steps{display:none;padding:10px 14px;background:rgba(230,32,32,.05);border-top:1px solid var(--border);font-size:12px;line-height:2;color:var(--muted)}
-  .chrome-steps.open{display:block}
-  .chrome-steps strong{color:var(--text)}
-  .step{display:flex;align-items:flex-start;gap:8px;margin-bottom:2px}
-  .step-num{width:20px;height:20px;background:var(--acc);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+  /* Controls Bar */
+  .ctrl-bar{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.88));padding:24px 12px 8px;display:flex;align-items:center;gap:6px;z-index:25;opacity:0;pointer-events:none;transition:opacity .3s}
+  .ctrl-bar.show{opacity:1;pointer-events:all}
+  .ctrl-ch{flex:1;font-size:12px;font-weight:600;text-shadow:0 1px 4px #000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+  .cbtn{background:rgba(255,255,255,.12);border:none;color:#fff;font-size:16px;cursor:pointer;padding:5px 9px;border-radius:6px;line-height:1;flex-shrink:0;transition:background .15s}
+  .cbtn:hover,.cbtn:focus{background:rgba(255,255,255,.28);outline:2px solid var(--acc);outline-offset:1px}
+  .vol-wrap{display:flex;align-items:center;gap:4px;flex-shrink:0}
+  .vol-sl{width:65px;accent-color:var(--acc);cursor:pointer;height:3px}
 
-  /* ── Grid ── */
+  /* Grid */
   .grid-area{flex:1;overflow-y:auto;padding:10px}
   .grid-area::-webkit-scrollbar{width:5px}
   .grid-area::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:3px}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
   .gc{border-radius:8px;background:var(--bg2);border:1px solid var(--border);cursor:pointer;padding:9px;display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;transition:border .12s,transform .1s}
-  .gc:hover{border-color:var(--acc);transform:translateY(-1px)}
+  .gc:hover,.gc:focus{border-color:var(--acc);transform:translateY(-1px);outline:none}
   .gc.on{border-color:var(--acc);background:var(--bg3);box-shadow:0 0 0 2px rgba(230,32,32,.3)}
   .gc-logo{width:50px;height:34px;display:flex;align-items:center;justify-content:center;font-size:20px}
   .gc-logo img{width:100%;height:100%;object-fit:contain;border-radius:3px}
@@ -99,7 +89,7 @@
   .gc-cat{font-size:10px;color:var(--muted)}
   .grid-empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:30px;font-size:13px}
 
-  /* ── Admin Panel ── */
+  /* Admin */
   .adm-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;overflow-y:auto;padding:16px}
   .adm-bg.open{display:block}
   .adm-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;max-width:550px;margin:auto;padding:18px}
@@ -122,11 +112,11 @@
   .ab-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   #admStatus{margin-top:10px;font-size:12px;color:var(--muted);min-height:18px}
 
-  /* ── Toast ── */
+  /* Toast */
   .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a2030;border:1px solid var(--border);color:var(--text);padding:9px 18px;border-radius:8px;font-size:13px;z-index:999;animation:tf 2.8s forwards;pointer-events:none;white-space:nowrap}
   @keyframes tf{0%{opacity:0;transform:translateX(-50%) translateY(6px)}12%{opacity:1;transform:translateX(-50%)}80%{opacity:1}100%{opacity:0}}
 
-  /* ── Mobile ── */
+  /* Mobile */
   @media(max-width:600px){
     .layout{flex-direction:column}
     .sidebar{width:100%;border-left:none;border-bottom:1px solid var(--border);max-height:190px;transition:max-height .2s ease}
@@ -135,7 +125,7 @@
     .grid{grid-template-columns:repeat(auto-fill,minmax(85px,1fr));gap:6px}
     .hdr-t1,.hdr-t2{display:none}
   }
-  /* TV */
+  /* TV focus */
   :focus-visible{outline:2px solid var(--acc);outline-offset:2px}
   </style>
   </head>
@@ -165,36 +155,28 @@
     <div class="main">
 
       <!-- Player -->
-      <div class="player-wrap">
+      <div class="player-wrap" id="playerWrap">
         <video id="vid" playsinline preload="none"></video>
+
+        <!-- Loading/Error overlay -->
         <div class="ov" id="ov">
           <div class="ov-spin" id="spin" style="display:none"></div>
           <div id="ovIco" style="font-size:46px">▶</div>
           <div class="ov-title" id="ovTitle">MUS Player</div>
           <div class="ov-sub" id="ovSub">اختر قناة للبدء</div>
         </div>
-      </div>
 
-      <!-- HTTP Stream Helper Panel -->
-      <div class="http-panel" id="httpPanel">
-        <div class="http-top">
-          <div class="http-icon">⚠️</div>
-          <div class="http-msg" id="httpMsg">البث HTTP لا يمكن تشغيله في المتصفح مباشرة بسبب قيود الأمان — استخدم VLC</div>
-        </div>
-        <div class="http-actions">
-          <button class="btn-vlc" id="vlcBtn"><span class="vlc-logo">🎬</span>فتح في VLC الآن</button>
-          <button class="btn-cp" id="cpBtn">📋 نسخ الرابط</button>
-          <button class="btn-chrome" id="chromeHelpBtn">⚙️ تشغيل داخل Chrome</button>
-        </div>
-        <div class="chrome-steps" id="chromeSteps">
-          <strong>خطوات تفعيل البث في Chrome (مرة واحدة فقط):</strong><br>
-          <div class="step"><span class="step-num">1</span><span>انقر على أيقونة 🔒 أو ⓘ في شريط العناوين</span></div>
-          <div class="step"><span class="step-num">2</span><span>انقر على <strong>"إعدادات الموقع"</strong></span></div>
-          <div class="step"><span class="step-num">3</span><span>ابحث عن <strong>"محتوى غير آمن"</strong> → اضبطه على <strong>"سماح"</strong></span></div>
-          <div class="step"><span class="step-num">4</span><span>أعد تحميل الصفحة ← ستشتغل القناة مباشرة في التطبيق ✓</span></div>
-          <div style="margin-top:8px;padding:6px 8px;background:rgba(34,197,94,.1);border-radius:5px;border-right:2px solid var(--green);font-size:11px;color:var(--green)">
-            💡 هذا الإعداد يُحفظ تلقائياً ولن تحتاج لتكراره
+        <!-- Controls bar -->
+        <div class="ctrl-bar" id="ctrlBar">
+          <button class="cbtn" id="cbPrev" title="القناة السابقة">⏮</button>
+          <button class="cbtn" id="cbPlay" title="تشغيل/إيقاف">⏸</button>
+          <button class="cbtn" id="cbNext" title="القناة التالية">⏭</button>
+          <div class="ctrl-ch" id="ctrlCh">—</div>
+          <div class="vol-wrap">
+            <button class="cbtn" id="cbMute" title="كتم الصوت">🔊</button>
+            <input class="vol-sl" id="volSl" type="range" min="0" max="1" step="0.05" value="1">
           </div>
+          <button class="cbtn" id="cbFs" title="ملء الشاشة">⛶</button>
         </div>
       </div>
 
@@ -214,8 +196,7 @@
     </div>
 
     <div class="tip">
-      💡 <strong>ملاحظة:</strong> روابط HTTP لا تُشغَّل في Chrome على HTTPS. 
-      استخدم زر <strong>VLC</strong>، أو فعّل "محتوى غير آمن" من إعدادات الموقع في Chrome مرة واحدة.
+      💡 كتابة <strong>bouchta</strong> في خانة البحث تفتح هذه اللوحة
     </div>
 
     <div class="f">
@@ -238,7 +219,7 @@
       <div class="f"><label>اسم القناة</label><input id="aName"></div>
       <div class="f"><label>التصنيف</label><input id="aCat" value="عام"></div>
     </div>
-    <div class="f"><label>رابط البث (.m3u8)</label><input id="aUrl" dir="ltr"></div>
+    <div class="f"><label>رابط البث (.m3u8 / .ts)</label><input id="aUrl" dir="ltr"></div>
     <div class="f"><label>رابط الشعار (اختياري)</label><input id="aLogo" dir="ltr"></div>
     <button class="ab p" id="addCh">➕ إضافة قناة</button>
 
@@ -271,11 +252,12 @@
   }
 
   /* ── State ── */
-  var CHS   = (function(){ var a=lget(KEY,null); return(Array.isArray(a)&&a.length)?a:defChs(); })();
-  var FAVS  = lget(FKEY,[]);
+  var CHS  = (function(){ var a=lget(KEY,null); return(Array.isArray(a)&&a.length)?a:defChs(); })();
+  var FAVS = lget(FKEY,[]);
   var curId=null, curUrl=null, aCat='الكل', srchQ='', favOnly=false, hls=null;
-  var vid   = document.getElementById('vid');
-  var ovEl  = document.getElementById('ov');
+  var vid  = document.getElementById('vid');
+  var ovEl = document.getElementById('ov');
+  var ctrlBar = document.getElementById('ctrlBar');
 
   /* ── HLS cleanup ── */
   function killHls(){
@@ -293,137 +275,124 @@
     document.getElementById('ovTitle').textContent = title || 'MUS Player';
     document.getElementById('ovSub').textContent   = sub || '';
     ovEl.classList.remove('gone');
+    ctrlBar.classList.remove('show');
   }
   function hideOv(){
     ovEl.classList.add('gone');
-  }
-  function hideHttpPanel(){
-    document.getElementById('httpPanel').classList.remove('open');
+    ctrlBar.classList.add('show');
   }
 
-  /* ── VLC deep link (Android + iOS) ── */
-  function openVLC(url){
-    var scheme = url.split(':')[0]; // 'http' or 'https'
-    var host   = url.replace(/^https?:\/\//, '');
-    // Android intent URL — most reliable method across all Android versions
-    var intentUrl = 'intent://' + host +
-      '#Intent;scheme=' + scheme +
-      ';type=video/x-mpegURL' +
-      ';package=org.videolan.vlc' +
-      ';S.browser_fallback_url=market://details?id=org.videolan.vlc' +
-      ';end';
-    window.location.href = intentUrl;
-  }
+  /* ── Player Controls ── */
+  document.getElementById('cbPlay').addEventListener('click', function(){
+    if(vid.paused){ vid.play(); this.textContent='⏸'; }
+    else { vid.pause(); this.textContent='▶'; }
+  });
+  vid.addEventListener('play',  function(){ document.getElementById('cbPlay').textContent='⏸'; });
+  vid.addEventListener('pause', function(){ document.getElementById('cbPlay').textContent='▶'; });
 
-  /* ── Show HTTP stream helper ── */
-  function showHttpPanel(url, ch, msg){
-    showOv(false, '📡', ch ? ch.name : '—', msg || 'اختر طريقة التشغيل أدناه');
-    var panel = document.getElementById('httpPanel');
-    panel.classList.add('open');
-    document.getElementById('httpMsg').textContent =
-      'بث HTTP · ' + (ch ? ch.name : '') + ' — لا يتشغّل في Chrome مباشرة على HTTPS';
+  document.getElementById('cbMute').addEventListener('click', function(){
+    vid.muted = !vid.muted;
+    this.textContent = vid.muted ? '🔇' : '🔊';
+    document.getElementById('volSl').value = vid.muted ? 0 : vid.volume;
+  });
+  document.getElementById('volSl').addEventListener('input', function(){
+    vid.volume = parseFloat(this.value);
+    vid.muted = (vid.volume === 0);
+    document.getElementById('cbMute').textContent = vid.muted ? '🔇' : '🔊';
+  });
 
-    document.getElementById('vlcBtn').onclick = function(){
-      openVLC(url);
-      toast('🎬 جاري فتح VLC...');
-    };
-    document.getElementById('cpBtn').onclick = function(){
-      var textarea=document.createElement('textarea');
-      textarea.value=url;
-      document.body.appendChild(textarea);
-      textarea.select();
-      try{ document.execCommand('copy'); toast('✓ تم نسخ الرابط'); }catch(e){}
-      document.body.removeChild(textarea);
-      if(navigator.clipboard) navigator.clipboard.writeText(url).then(function(){ toast('✓ تم نسخ الرابط'); }).catch(function(){});
-    };
-    document.getElementById('chromeHelpBtn').onclick = function(){
-      var steps = document.getElementById('chromeSteps');
-      steps.classList.toggle('open');
-    };
-  }
+  document.getElementById('cbFs').addEventListener('click', function(){
+    var pw = document.getElementById('playerWrap');
+    if(document.fullscreenElement){
+      document.exitFullscreen();
+      this.textContent='⛶';
+    } else {
+      (pw.requestFullscreen||pw.webkitRequestFullscreen||pw.mozRequestFullScreen).call(pw);
+      this.textContent='✕';
+    }
+  });
 
-  /* ── Load stream ── */
+  document.getElementById('cbPrev').addEventListener('click', function(){
+    var list=getList(), idx=list.findIndex(function(c){return c.id===curId;});
+    if(idx>0) playCh(list[idx-1].id);
+  });
+  document.getElementById('cbNext').addEventListener('click', function(){
+    var list=getList(), idx=list.findIndex(function(c){return c.id===curId;});
+    if(idx<list.length-1) playCh(list[idx+1].id);
+  });
+
+  /* ── Load Stream (HLS.js first, no VLC dependency) ── */
   function loadStream(url, ch){
     killHls();
-    hideHttpPanel();
     curUrl = url;
+    document.getElementById('ctrlCh').textContent = ch ? ch.name : '—';
     showOv(true, '📺', ch ? ch.name : '...', 'جاري التحميل...');
 
-    var isHttp = /^http:\/\//.test(url);
-    var secUrl = isHttp ? 'https://' + url.slice(7).replace(/:80\//, '/').replace(/:80$/, '') : url;
+    var isHls = /\.m3u8?$/i.test(url.split('?')[0]) ||
+                url.indexOf('/live/') > -1 ||
+                url.indexOf('.m3u8') > -1 ||
+                url.indexOf('/hls/') > -1;
 
-    var attempts = 0;
-    var maxAttempts = 4;
-
-    function onFail(reason){
-      attempts++;
-      if(attempts >= maxAttempts){
-        // All attempts failed
-        if(isHttp){
-          // HTTP stream on HTTPS page — guide user
-          showHttpPanel(url, ch, reason);
+    if(isHls && window.Hls && Hls.isSupported()){
+      tryHlsJs(url, ch);
+    } else if(vid.canPlayType('application/vnd.apple.mpegurl') && isHls){
+      tryNative(url, ch, function(){
+        showOv(false,'⚠️', ch?ch.name:'—', 'تعذّر تشغيل البث');
+      });
+    } else {
+      tryNative(url, ch, function(){
+        if(isHls && window.Hls && Hls.isSupported()){
+          tryHlsJs(url, ch);
         } else {
-          showOv(false, '⚠️', ch ? ch.name : '—', reason || 'تعذّر تشغيل البث');
+          showOv(false,'⚠️', ch?ch.name:'—', 'تعذّر تشغيل البث — تحقق من الرابط');
         }
-        return;
-      }
-
-      if(attempts === 1){
-        // Try HLS.js with secure URL
-        tryHlsJs(secUrl);
-      } else if(attempts === 2 && isHttp){
-        // Try native with original HTTP (might work if user enabled insecure content)
-        tryNative(url, function(){ onFail('البث محجوب'); });
-      } else if(attempts === 3 && isHttp){
-        // Try HLS.js with original HTTP
-        tryHlsJs(url);
-      } else {
-        onFail(isHttp ? 'استخدم VLC' : 'تعذّر التشغيل');
-      }
-    }
-
-    function tryNative(u, fail){
-      vid.oncanplay = null; vid.onerror = null;
-      vid.src = u; vid.load();
-      var done = false;
-      var t = setTimeout(function(){ if(!done){ vid.oncanplay=vid.onerror=null; fail&&fail(); } }, 5000);
-      vid.oncanplay = function(){
-        if(done) return; done=true; clearTimeout(t);
-        vid.oncanplay=vid.onerror=null; hideOv(); hideHttpPanel();
-        vid.play().catch(function(){});
-      };
-      vid.onerror = function(){
-        if(done) return; done=true; clearTimeout(t);
-        vid.oncanplay=vid.onerror=null; fail&&fail();
-      };
-    }
-
-    function tryHlsJs(u){
-      if(!window.Hls || !Hls.isSupported()){ onFail('HLS غير مدعوم'); return; }
-      killHls();
-      hls = new Hls({
-        enableWorker: false,
-        maxBufferLength: 20,
-        maxMaxBufferLength: 40,
-        fragLoadingTimeOut: 12000,
-        manifestLoadingTimeOut: 12000,
-        levelLoadingTimeOut: 12000
-      });
-      hls.loadSource(u);
-      hls.attachMedia(vid);
-      hls.once(Hls.Events.MANIFEST_PARSED, function(){
-        hideOv(); hideHttpPanel();
-        vid.play().catch(function(){});
-      });
-      hls.on(Hls.Events.ERROR, function(e, d){
-        if(d.fatal){ killHls(); onFail('خطأ في البث'); }
       });
     }
+  }
 
-    // Start: try native with secure URL first
-    tryNative(secUrl, function(){
-      onFail('فشل التحميل الأول');
+  function tryHlsJs(url, ch){
+    hls = new Hls({
+      enableWorker: false,
+      maxBufferLength: 20,
+      maxMaxBufferLength: 40,
+      fragLoadingTimeOut: 15000,
+      manifestLoadingTimeOut: 15000,
+      levelLoadingTimeOut: 15000
     });
+    hls.loadSource(url);
+    hls.attachMedia(vid);
+    var started = false;
+    hls.once(Hls.Events.MANIFEST_PARSED, function(){
+      started = true;
+      hideOv();
+      vid.play().catch(function(){});
+    });
+    hls.on(Hls.Events.ERROR, function(ev, d){
+      if(d.fatal){
+        killHls();
+        if(!started){
+          showOv(false,'⚠️', ch?ch.name:'—', 'فشل البث — تحقق من صحة الرابط');
+        }
+      }
+    });
+  }
+
+  function tryNative(url, ch, onFail){
+    vid.oncanplay = null; vid.onerror = null;
+    vid.src = url; vid.load();
+    var done = false;
+    var t = setTimeout(function(){
+      if(!done){ done=true; vid.oncanplay=vid.onerror=null; onFail&&onFail(); }
+    }, 12000);
+    vid.oncanplay = function(){
+      if(done) return; done=true; clearTimeout(t);
+      vid.oncanplay=vid.onerror=null;
+      hideOv(); vid.play().catch(function(){});
+    };
+    vid.onerror = function(){
+      if(done) return; done=true; clearTimeout(t);
+      vid.oncanplay=vid.onerror=null; onFail&&onFail();
+    };
   }
 
   /* ── Channel actions ── */
@@ -433,7 +402,6 @@
     curId = id;
     loadStream(ch.url, ch);
     render();
-    // Auto-show sidebar on TV
     if(window.innerWidth >= 1024) document.getElementById('sidebar').classList.remove('closed');
   }
 
@@ -447,9 +415,9 @@
 
   function getList(){
     var list = CHS.slice();
-    if(favOnly)    list = list.filter(function(c){ return FAVS.indexOf(c.id)>-1; });
+    if(favOnly)      list = list.filter(function(c){ return FAVS.indexOf(c.id)>-1; });
     if(aCat!=='الكل') list = list.filter(function(c){ return c.cat===aCat; });
-    if(srchQ)      list = list.filter(function(c){ return (c.name+' '+(c.cat||'')).toLowerCase().indexOf(srchQ)>-1; });
+    if(srchQ)        list = list.filter(function(c){ return (c.name+' '+(c.cat||'')).toLowerCase().indexOf(srchQ)>-1; });
     return list;
   }
 
@@ -466,14 +434,12 @@
     var cats = ['الكل'];
     CHS.forEach(function(c){ if(c.cat && cats.indexOf(c.cat)<0) cats.push(c.cat); });
 
-    // Categories
     var ch='';
     cats.forEach(function(c){
       ch += '<div class="cat'+(aCat===c?' on':'')+'" data-cat="'+esc(c)+'">'+esc(c)+'</div>';
     });
     document.getElementById('cats').innerHTML = ch;
 
-    // Sidebar channel list
     var sb='';
     if(!list.length){
       sb='<div class="sb-empty"><div style="font-size:34px">📭</div><div>لا توجد قنوات</div><div style="font-size:10px;margin-top:4px">افتح لوحة التحكم بكتابة bouchta</div></div>';
@@ -489,14 +455,13 @@
     }
     document.getElementById('chlist').innerHTML = sb;
 
-    // Grid
     var gr='';
     if(!list.length){
       gr='<div class="grid-empty">لا توجد نتائج</div>';
     } else {
       list.forEach(function(c){
         var on=c.id===curId;
-        gr += '<div class="gc'+(on?' on':'')+'" data-cid="'+esc(c.id)+'">'
+        gr += '<div class="gc'+(on?' on':'')+'" data-cid="'+esc(c.id)+'" tabindex="0">'
             + '<div class="gc-logo">'+mkLogo(c.logo,'big')+'</div>'
             + '<div class="gc-name">'+esc(c.name)+'</div>'
             + '<div class="gc-cat">'+esc(c.cat||'')+'</div>'
@@ -520,6 +485,11 @@
   });
   document.getElementById('grid').addEventListener('click', function(e){
     var item=e.target.closest('[data-cid]'); if(item) playCh(item.dataset.cid);
+  });
+  document.getElementById('grid').addEventListener('keydown', function(e){
+    if(e.key==='Enter'||e.key===' '){
+      var item=e.target.closest('[data-cid]'); if(item){ e.preventDefault(); playCh(item.dataset.cid); }
+    }
   });
 
   /* ── Search ── */
@@ -548,9 +518,21 @@
     var list=getList(), idx=curId?list.findIndex(function(c){return c.id===curId;}):-1;
     if(e.key==='ArrowDown'&&idx<list.length-1){ e.preventDefault(); playCh(list[idx+1].id); }
     else if(e.key==='ArrowUp'&&idx>0){ e.preventDefault(); playCh(list[idx-1].id); }
-    else if(e.key==='ArrowRight'||e.key==='ArrowLeft'){ /* quality switch placeholder */ }
     else if((e.key==='Enter'||e.key===' ')&&vid.src){ e.preventDefault(); vid.paused?vid.play():vid.pause(); }
     else if(e.key==='MediaPlayPause'){ vid.paused?vid.play():vid.pause(); }
+    else if(e.key==='VolumeUp'){ vid.volume=Math.min(1,vid.volume+0.1); document.getElementById('volSl').value=vid.volume; }
+    else if(e.key==='VolumeDown'){ vid.volume=Math.max(0,vid.volume-0.1); document.getElementById('volSl').value=vid.volume; }
+  });
+
+  /* ── Touch on player — show controls briefly ── */
+  document.getElementById('playerWrap').addEventListener('click', function(){
+    if(ovEl.classList.contains('gone')){
+      ctrlBar.classList.add('show');
+      clearTimeout(window._ctrlT);
+      window._ctrlT = setTimeout(function(){
+        if(!vid.paused) ctrlBar.classList.add('show');
+      }, 3000);
+    }
   });
 
   /* ── Toast ── */
@@ -589,8 +571,7 @@
   }
 
   function fetchWithFallback(url){
-    return fetch(url).catch(function(e){
-      // Try CORS proxy as fallback
+    return fetch(url).catch(function(){
       return fetch('https://corsproxy.io/?'+encodeURIComponent(url));
     });
   }
@@ -603,9 +584,10 @@
     fetchWithFallback(url).then(function(r){ return r.text(); }).then(function(text){
       var chs=parseM3u(text);
       if(!chs.length){ setStatus('لم تُعثر على قنوات'); return; }
-      CHS=chs; lset(KEY,CHS); render();
+      CHS=chs; lset(KEY,CHS); aCat='الكل'; render();
       setStatus('✓ تم استيراد '+chs.length+' قناة', true);
       toast('✓ '+chs.length+' قناة مستوردة');
+      closeAdm();
     }).catch(function(e){ setStatus('خطأ: '+e.message); });
   });
 
@@ -615,33 +597,41 @@
     var usr=document.getElementById('xcUser').value.trim();
     var pas=document.getElementById('xcPass').value.trim();
     if(!srv||!usr||!pas){ setStatus('أدخل السيرفر والمستخدم وكلمة المرور'); return; }
-    // Try HTTPS upgrade of server
-    var base=srv.replace(/^http:\/\//,'https://').replace(/:80$/,'');
-    var url=base+'/get.php?username='+encodeURIComponent(usr)+'&password='+encodeURIComponent(pas)+'&type=m3u_plus&output=ts';
+    var url=srv+'/get.php?username='+encodeURIComponent(usr)+'&password='+encodeURIComponent(pas)+'&type=m3u_plus&output=ts';
     setStatus('⏳ جاري الاستيراد...');
     fetchWithFallback(url).then(function(r){ return r.text(); }).then(function(text){
-      if(!text.includes('#EXTINF')) throw new Error('استجابة غير صالحة — جرّب رابط M3U مباشرة');
+      if(!text.includes('#EXTINF')) throw new Error('استجابة غير صالحة');
       var chs=parseM3u(text);
       if(!chs.length) throw new Error('لم تُعثر على قنوات');
-      CHS=chs; lset(KEY,CHS); render();
+      CHS=chs; lset(KEY,CHS); aCat='الكل'; render();
       setStatus('✓ تم استيراد '+chs.length+' قناة', true);
       toast('✓ '+chs.length+' قناة');
+      closeAdm();
     }).catch(function(e){ setStatus('خطأ: '+e.message); });
   });
 
-  /* ── Add channel ── */
+  /* ── Add channel — FIX: reset filter + close panel immediately ── */
   document.getElementById('addCh').addEventListener('click', function(){
     var name=document.getElementById('aName').value.trim();
     var url=document.getElementById('aUrl').value.trim();
     var cat=document.getElementById('aCat').value.trim()||'عام';
     var logo=document.getElementById('aLogo').value.trim();
     if(!name||!url){ setStatus('أدخل الاسم والرابط'); return; }
-    CHS.push({id:nextId(),name:name,url:url,cat:cat,logo:logo,ar:''});
-    lset(KEY,CHS); render();
+    var newCh = {id:nextId(),name:name,url:url,cat:cat,logo:logo,ar:''};
+    CHS.push(newCh);
+    lset(KEY,CHS);
+    // Reset filter so new channel is visible
+    aCat = 'الكل';
+    favOnly = false;
+    srchQ = '';
+    sq.value = '';
+    render();
+    // Clear fields
     document.getElementById('aName').value='';
     document.getElementById('aUrl').value='';
     document.getElementById('aLogo').value='';
-    setStatus('✓ تمت الإضافة', true);
+    document.getElementById('aCat').value='عام';
+    setStatus('✓ تمت الإضافة — اضغط ✕ لرؤية القناة', true);
     toast('✓ القناة أُضيفت');
   });
 
@@ -655,7 +645,8 @@
   document.getElementById('clrBtn').addEventListener('click', function(){
     if(!confirm('مسح كل القنوات؟')) return;
     CHS=[]; lset(KEY,CHS); killHls(); curId=null;
-    hideHttpPanel(); showOv(false,'▶','MUS Player','اختر قناة للبدء');
+    ctrlBar.classList.remove('show');
+    showOv(false,'▶','MUS Player','اختر قناة للبدء');
     render(); toast('تم المسح');
   });
 
