@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#0a0c14">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
   <title>MUS Player</title>
   <link rel="manifest" href="manifest.json">
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js"></script>
@@ -24,23 +23,23 @@
   .search-wrap input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:14px;padding:8px 10px;min-width:0;direction:rtl}
   .search-wrap input::placeholder{color:var(--muted);font-size:13px}
   .ibtn{width:36px;height:36px;min-width:36px;background:none;border:none;color:var(--text);cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;transition:background .15s;flex-shrink:0}
-  .ibtn:hover,.ibtn.on{background:var(--bg3)}
+  .ibtn:hover,.ibtn.on,.ibtn:focus{background:var(--bg3);outline:none}
 
   /* Layout */
   .layout{display:flex;height:calc(100dvh - 52px);overflow:hidden}
 
   /* Sidebar */
-  .sidebar{width:240px;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;transition:width .2s ease}
+  .sidebar{width:220px;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;transition:width .2s ease}
   .sidebar.closed{width:0;border:none}
   .cats{display:flex;flex-wrap:wrap;gap:4px;padding:8px;border-bottom:1px solid var(--border);flex-shrink:0}
   .cat{padding:3px 9px;border-radius:20px;font-size:12px;cursor:pointer;background:var(--bg3);color:var(--muted);border:1px solid transparent;white-space:nowrap;transition:.12s}
   .cat.on{background:var(--acc);color:#fff;border-color:var(--acc)}
-  .cat:hover:not(.on){border-color:var(--acc);color:var(--text)}
+  .cat:hover:not(.on),.cat:focus:not(.on){border-color:var(--acc);color:var(--text);outline:none}
   .chlist{flex:1;overflow-y:auto;padding:4px}
   .chlist::-webkit-scrollbar{width:3px}
   .chlist::-webkit-scrollbar-thumb{background:var(--bg3)}
   .chi{display:flex;align-items:center;gap:7px;padding:7px 8px;border-radius:7px;cursor:pointer;margin-bottom:2px;border-right:3px solid transparent;transition:.12s}
-  .chi:hover{background:var(--bg3)}
+  .chi:hover,.chi:focus{background:var(--bg3);outline:none}
   .chi.on{background:var(--bg3);border-right-color:var(--acc)}
   .chi-logo{width:34px;height:24px;background:var(--bg);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;overflow:hidden;flex-shrink:0}
   .chi-logo img{width:100%;height:100%;object-fit:contain}
@@ -55,7 +54,7 @@
   .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 
   /* Player */
-  .player-wrap{position:relative;width:100%;background:#000;flex-shrink:0;aspect-ratio:16/9;max-height:52vh}
+  .player-wrap{position:relative;width:100%;background:#000;flex-shrink:0;aspect-ratio:16/9;max-height:50vh}
   #vid{width:100%;height:100%;display:block;background:#000;outline:none}
 
   /* Overlay */
@@ -64,43 +63,45 @@
   .ov-spin{width:34px;height:34px;border:3px solid var(--bg3);border-top-color:var(--acc);border-radius:50%;animation:sp .7s linear infinite;flex-shrink:0}
   @keyframes sp{to{transform:rotate(360deg)}}
   .ov-title{font-size:17px;font-weight:700;max-width:100%}
-  .ov-sub{font-size:12px;color:var(--muted);max-width:240px;line-height:1.5}
+  .ov-sub{font-size:12px;color:var(--muted);max-width:260px;line-height:1.5}
 
-  /* Controls Bar */
-  .ctrl-bar{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.88));padding:24px 12px 8px;display:flex;align-items:center;gap:6px;z-index:25;opacity:0;pointer-events:none;transition:opacity .3s}
+  /* Controls Bar - always visible when playing */
+  .ctrl-bar{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.9));padding:28px 12px 10px;display:flex;align-items:center;gap:6px;z-index:25;opacity:0;pointer-events:none;transition:opacity .3s}
   .ctrl-bar.show{opacity:1;pointer-events:all}
   .ctrl-ch{flex:1;font-size:12px;font-weight:600;text-shadow:0 1px 4px #000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-  .cbtn{background:rgba(255,255,255,.12);border:none;color:#fff;font-size:16px;cursor:pointer;padding:5px 9px;border-radius:6px;line-height:1;flex-shrink:0;transition:background .15s}
-  .cbtn:hover,.cbtn:focus{background:rgba(255,255,255,.28);outline:2px solid var(--acc);outline-offset:1px}
+  .cbtn{background:rgba(255,255,255,.14);border:none;color:#fff;font-size:18px;cursor:pointer;padding:6px 10px;border-radius:6px;line-height:1;flex-shrink:0;transition:background .15s}
+  .cbtn:hover,.cbtn:focus{background:rgba(230,32,32,.7);outline:2px solid var(--acc);outline-offset:1px}
   .vol-wrap{display:flex;align-items:center;gap:4px;flex-shrink:0}
-  .vol-sl{width:65px;accent-color:var(--acc);cursor:pointer;height:3px}
+  .vol-sl{width:70px;accent-color:var(--acc);cursor:pointer;height:3px}
 
   /* Grid */
   .grid-area{flex:1;overflow-y:auto;padding:10px}
   .grid-area::-webkit-scrollbar{width:5px}
   .grid-area::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:3px}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
-  .gc{border-radius:8px;background:var(--bg2);border:1px solid var(--border);cursor:pointer;padding:9px;display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;transition:border .12s,transform .1s}
-  .gc:hover,.gc:focus{border-color:var(--acc);transform:translateY(-1px);outline:none}
+  .gc{border-radius:8px;background:var(--bg2);border:2px solid var(--border);cursor:pointer;padding:9px;display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;transition:border .12s,transform .1s}
+  .gc:hover{border-color:var(--acc);transform:translateY(-1px)}
+  .gc:focus{border-color:var(--acc);outline:none;box-shadow:0 0 0 3px rgba(230,32,32,.5);transform:translateY(-1px)}
   .gc.on{border-color:var(--acc);background:var(--bg3);box-shadow:0 0 0 2px rgba(230,32,32,.3)}
-  .gc-logo{width:50px;height:34px;display:flex;align-items:center;justify-content:center;font-size:20px}
+  .gc-logo{width:50px;height:34px;display:flex;align-items:center;justify-content:contain;font-size:20px}
   .gc-logo img{width:100%;height:100%;object-fit:contain;border-radius:3px}
   .gc-name{font-size:11px;font-weight:600;line-height:1.3;word-break:break-word}
   .gc-cat{font-size:10px;color:var(--muted)}
   .grid-empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:30px;font-size:13px}
 
   /* Admin */
-  .adm-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;overflow-y:auto;padding:16px}
+  .adm-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;overflow-y:auto;padding:16px}
   .adm-bg.open{display:block}
-  .adm-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;max-width:550px;margin:auto;padding:18px}
+  .adm-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;max-width:560px;margin:auto;padding:18px}
   .adm-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
   .adm-hdr h2{font-size:16px}
   .adm-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0 4px;line-height:1}
   .tip{font-size:12px;color:var(--muted);background:rgba(230,32,32,.07);border-right:3px solid var(--acc);border-radius:6px;padding:8px 10px;line-height:1.6;margin-bottom:12px}
   .f{margin-bottom:10px}
   .f label{display:block;font-size:11px;color:var(--muted);margin-bottom:3px}
-  .f input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;transition:border .15s}
-  .f input:focus{border-color:var(--acc)}
+  .f input,.f textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;transition:border .15s}
+  .f input:focus,.f textarea:focus{border-color:var(--acc)}
+  .f textarea{resize:none;height:58px;font-family:monospace;font-size:11px;direction:ltr}
   .frow{display:flex;gap:8px;flex-wrap:wrap}
   .frow .f{flex:1;min-width:90px}
   .sep{border:none;border-top:1px solid var(--border);margin:14px 0}
@@ -121,44 +122,51 @@
     .layout{flex-direction:column}
     .sidebar{width:100%;border-left:none;border-bottom:1px solid var(--border);max-height:190px;transition:max-height .2s ease}
     .sidebar.closed{max-height:0;border:none}
-    .player-wrap{aspect-ratio:unset;height:43vw;max-height:unset}
+    .player-wrap{aspect-ratio:unset;height:42vw;max-height:unset}
     .grid{grid-template-columns:repeat(auto-fill,minmax(85px,1fr));gap:6px}
     .hdr-t1,.hdr-t2{display:none}
+    .vol-sl{width:50px}
   }
-  /* TV focus */
-  :focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+
+  /* TV — big screen enhancements */
+  @media(min-width:1024px){
+    .player-wrap{max-height:56vh}
+    .gc{min-height:80px}
+    .gc-name{font-size:13px}
+    .cbtn{font-size:22px;padding:8px 14px}
+    .ctrl-ch{font-size:14px}
+    .chi-name{font-size:13px}
+  }
+
+  /* Focus rings for TV remote nav */
+  *:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
   </style>
   </head>
   <body>
 
   <div class="hdr">
-    <button class="ibtn" id="menuBtn" title="القائمة">☰</button>
-    <button class="ibtn" id="favBtn">☆</button>
+    <button class="ibtn" id="menuBtn" tabindex="0">☰</button>
+    <button class="ibtn" id="favBtn" tabindex="0">☆</button>
     <div class="search-wrap">
       <span style="color:var(--muted);padding-right:2px;font-size:15px">🔍</span>
-      <input id="sq" type="text" placeholder="بحث..." autocomplete="off" spellcheck="false" inputmode="search">
+      <input id="sq" type="text" placeholder="بحث..." autocomplete="off" spellcheck="false">
     </div>
     <div class="hdr-logo">
       <div class="hdr-icon">▶</div>
-      <div><div class="hdr-t1">MUS Player</div><div class="hdr-t2">LIVE TV & 4K</div></div>
+      <div><div class="hdr-t1">MUS Player</div><div class="hdr-t2">LIVE TV &amp; 4K</div></div>
     </div>
   </div>
 
   <div class="layout">
-    <!-- Sidebar -->
     <div class="sidebar closed" id="sidebar">
       <div class="cats" id="cats"></div>
       <div class="chlist" id="chlist"></div>
     </div>
 
-    <!-- Main -->
     <div class="main">
-
-      <!-- Player -->
       <div class="player-wrap" id="playerWrap">
         <video id="vid" playsinline preload="none"></video>
 
-        <!-- Loading/Error overlay -->
         <div class="ov" id="ov">
           <div class="ov-spin" id="spin" style="display:none"></div>
           <div id="ovIco" style="font-size:46px">▶</div>
@@ -166,22 +174,18 @@
           <div class="ov-sub" id="ovSub">اختر قناة للبدء</div>
         </div>
 
-        <!-- Controls bar -->
         <div class="ctrl-bar" id="ctrlBar">
-          <button class="cbtn" id="cbPrev" title="القناة السابقة">⏮</button>
-          <button class="cbtn" id="cbPlay" title="تشغيل/إيقاف">⏸</button>
-          <button class="cbtn" id="cbNext" title="القناة التالية">⏭</button>
+          <button class="cbtn" id="cbPrev" tabindex="-1">⏮</button>
+          <button class="cbtn" id="cbPlay" tabindex="-1">⏸</button>
+          <button class="cbtn" id="cbNext" tabindex="-1">⏭</button>
           <div class="ctrl-ch" id="ctrlCh">—</div>
-          <div class="vol-wrap">
-            <button class="cbtn" id="cbMute" title="كتم الصوت">🔊</button>
-            <input class="vol-sl" id="volSl" type="range" min="0" max="1" step="0.05" value="1">
-          </div>
-          <button class="cbtn" id="cbFs" title="ملء الشاشة">⛶</button>
+          <button class="cbtn" id="cbMute" tabindex="-1">🔊</button>
+          <input class="vol-sl" id="volSl" type="range" min="0" max="1" step="0.05" value="1" tabindex="-1">
+          <button class="cbtn" id="cbFs" tabindex="-1">⛶</button>
         </div>
       </div>
 
-      <!-- Grid -->
-      <div class="grid-area">
+      <div class="grid-area" id="gridArea">
         <div class="grid" id="grid"></div>
       </div>
     </div>
@@ -195,18 +199,16 @@
       <button class="adm-close" id="closeAdm">✕</button>
     </div>
 
-    <div class="tip">
-      💡 أدخل كلمة المرور في خانة البحث للدخول لهذه اللوحة
-    </div>
+    <div class="tip">💡 أدخل كلمة المرور في خانة البحث للوصول لهذه اللوحة</div>
 
     <div class="f">
       <label>رابط قائمة M3U / m3u_plus</label>
-      <input id="m3uUrl" type="url" placeholder="http://server.com/get.php?username=...&type=m3u_plus" dir="ltr">
+      <input id="m3uUrl" type="url" placeholder="http://server.com/get.php?username=...&amp;type=m3u_plus" dir="ltr">
     </div>
     <button class="ab p" id="importM3u">📥 استيراد M3U</button>
 
     <hr class="sep">
-    <div style="font-size:11px;color:var(--muted);margin-bottom:8px">أو بيانات Xtream Codes:</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Xtream Codes:</div>
     <div class="frow">
       <div class="f"><label>السيرفر</label><input id="xcSrv" placeholder="http://server:8080" dir="ltr"></div>
       <div class="f"><label>المستخدم</label><input id="xcUser" dir="ltr"></div>
@@ -217,11 +219,25 @@
     <hr class="sep">
     <div class="frow">
       <div class="f"><label>اسم القناة</label><input id="aName"></div>
-      <div class="f"><label>التصنيف</label><input id="aCat" value="عام"></div>
+      <div class="f"><label>التصنيف</label><input id="aCatIn" value="عام"></div>
     </div>
     <div class="f"><label>رابط البث (.m3u8 / .ts)</label><input id="aUrl" dir="ltr"></div>
     <div class="f"><label>رابط الشعار (اختياري)</label><input id="aLogo" dir="ltr"></div>
     <button class="ab p" id="addCh">➕ إضافة قناة</button>
+
+    <hr class="sep">
+    <!-- Sync between devices -->
+    <div style="font-size:12px;color:var(--text);font-weight:600;margin-bottom:8px">📲 مزامنة القنوات بين الأجهزة</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px">صدّر رمز المزامنة من جهاز واستورده في الجهاز الآخر</div>
+    <div class="ab-row" style="margin-bottom:8px">
+      <button class="ab s" id="syncExportBtn" style="flex:1">📤 نسخ رمز المزامنة</button>
+      <button class="ab s" id="syncShowImport" style="flex:1">📥 استيراد رمز</button>
+    </div>
+    <div class="f" id="syncImportWrap" style="display:none">
+      <label>الصق رمز المزامنة هنا</label>
+      <textarea id="syncCodeIn" placeholder="الصق الرمز هنا..."></textarea>
+      <button class="ab p" style="width:100%;margin-top:6px" id="doSyncImport">✓ تطبيق المزامنة</button>
+    </div>
 
     <hr class="sep">
     <div class="ab-row">
@@ -237,7 +253,7 @@
   var TRIG='bouchta', KEY='mus_v2', FKEY='mus_fav';
 
   /* ── Helpers ── */
-  function imgErr(img){ img.style.display='none'; }
+  function imgErr(i){ i.style.display='none'; }
   function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   function nextId(){ return Date.now()+'-'+Math.random().toString(36).slice(2,5); }
   function lget(k,d){ try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;} }
@@ -246,15 +262,15 @@
   /* ── Default channels ── */
   function defChs(){
     return [
-      {id:'test1',name:'بث تجريبي HTTPS ✓',url:'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',cat:'تجريبي',logo:'',ar:''},
-      {id:'test2',name:'Big Buck Bunny 4K',url:'https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8',cat:'تجريبي',logo:'',ar:''}
+      {id:'t1',name:'بث تجريبي HTTPS',url:'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',cat:'تجريبي',logo:''},
+      {id:'t2',name:'Big Buck Bunny 4K',url:'https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8',cat:'تجريبي',logo:''}
     ];
   }
 
   /* ── State ── */
   var CHS  = (function(){ var a=lget(KEY,null); return(Array.isArray(a)&&a.length)?a:defChs(); })();
   var FAVS = lget(FKEY,[]);
-  var curId=null, curUrl=null, aCat='الكل', srchQ='', favOnly=false, hls=null;
+  var curId=null, aCat='الكل', srchQ='', favOnly=false, hls=null;
   var vid  = document.getElementById('vid');
   var ovEl = document.getElementById('ov');
   var ctrlBar = document.getElementById('ctrlBar');
@@ -262,18 +278,16 @@
   /* ── HLS cleanup ── */
   function killHls(){
     if(hls){try{hls.destroy();}catch(e){} hls=null;}
-    vid.pause();
-    vid.removeAttribute('src');
-    vid.load();
+    vid.pause(); vid.removeAttribute('src'); vid.load();
   }
 
-  /* ── Overlay helpers ── */
-  function showOv(loading, icon, title, sub){
-    document.getElementById('spin').style.display = loading ? 'block' : 'none';
-    document.getElementById('ovIco').style.display = loading ? 'none' : 'block';
-    document.getElementById('ovIco').textContent = icon || '▶';
-    document.getElementById('ovTitle').textContent = title || 'MUS Player';
-    document.getElementById('ovSub').textContent   = sub || '';
+  /* ── Overlay ── */
+  function showOv(loading,icon,title,sub){
+    document.getElementById('spin').style.display=loading?'block':'none';
+    document.getElementById('ovIco').style.display=loading?'none':'block';
+    document.getElementById('ovIco').textContent=icon||'▶';
+    document.getElementById('ovTitle').textContent=title||'MUS Player';
+    document.getElementById('ovSub').textContent=sub||'';
     ovEl.classList.remove('gone');
     ctrlBar.classList.remove('show');
   }
@@ -283,378 +297,386 @@
   }
 
   /* ── Player Controls ── */
-  document.getElementById('cbPlay').addEventListener('click', function(){
-    if(vid.paused){ vid.play(); this.textContent='⏸'; }
-    else { vid.pause(); this.textContent='▶'; }
-  });
-  vid.addEventListener('play',  function(){ document.getElementById('cbPlay').textContent='⏸'; });
-  vid.addEventListener('pause', function(){ document.getElementById('cbPlay').textContent='▶'; });
+  document.getElementById('cbPlay').onclick=function(){
+    if(vid.paused){vid.play();this.textContent='⏸';}else{vid.pause();this.textContent='▶';}
+  };
+  vid.addEventListener('play', function(){ document.getElementById('cbPlay').textContent='⏸'; });
+  vid.addEventListener('pause',function(){ document.getElementById('cbPlay').textContent='▶'; });
 
-  document.getElementById('cbMute').addEventListener('click', function(){
-    vid.muted = !vid.muted;
-    this.textContent = vid.muted ? '🔇' : '🔊';
-    document.getElementById('volSl').value = vid.muted ? 0 : vid.volume;
-  });
-  document.getElementById('volSl').addEventListener('input', function(){
-    vid.volume = parseFloat(this.value);
-    vid.muted = (vid.volume === 0);
-    document.getElementById('cbMute').textContent = vid.muted ? '🔇' : '🔊';
-  });
-
-  document.getElementById('cbFs').addEventListener('click', function(){
-    var pw = document.getElementById('playerWrap');
-    if(document.fullscreenElement){
-      document.exitFullscreen();
+  document.getElementById('cbMute').onclick=function(){
+    vid.muted=!vid.muted;
+    this.textContent=vid.muted?'🔇':'🔊';
+    document.getElementById('volSl').value=vid.muted?0:vid.volume;
+  };
+  document.getElementById('volSl').oninput=function(){
+    vid.volume=parseFloat(this.value);
+    vid.muted=vid.volume===0;
+    document.getElementById('cbMute').textContent=vid.muted?'🔇':'🔊';
+  };
+  document.getElementById('cbFs').onclick=function(){
+    var pw=document.getElementById('playerWrap');
+    if(document.fullscreenElement||document.webkitFullscreenElement){
+      (document.exitFullscreen||document.webkitExitFullscreen).call(document);
       this.textContent='⛶';
     } else {
-      (pw.requestFullscreen||pw.webkitRequestFullscreen||pw.mozRequestFullScreen).call(pw);
+      var fn=pw.requestFullscreen||pw.webkitRequestFullscreen||vid.requestFullscreen||vid.webkitRequestFullscreen;
+      if(fn) fn.call(pw||vid);
       this.textContent='✕';
     }
-  });
-
-  document.getElementById('cbPrev').addEventListener('click', function(){
-    var list=getList(), idx=list.findIndex(function(c){return c.id===curId;});
-    if(idx>0) playCh(list[idx-1].id);
-  });
-  document.getElementById('cbNext').addEventListener('click', function(){
-    var list=getList(), idx=list.findIndex(function(c){return c.id===curId;});
-    if(idx<list.length-1) playCh(list[idx+1].id);
-  });
-
-  /* ── Load Stream (HLS.js first, no VLC dependency) ── */
-  function loadStream(url, ch){
-    killHls();
-    curUrl = url;
-    document.getElementById('ctrlCh').textContent = ch ? ch.name : '—';
-    showOv(true, '📺', ch ? ch.name : '...', 'جاري التحميل...');
-
-    var isHls = /\.m3u8?$/i.test(url.split('?')[0]) ||
-                url.indexOf('/live/') > -1 ||
-                url.indexOf('.m3u8') > -1 ||
-                url.indexOf('/hls/') > -1;
-
-    if(isHls && window.Hls && Hls.isSupported()){
-      tryHlsJs(url, ch);
-    } else if(vid.canPlayType('application/vnd.apple.mpegurl') && isHls){
-      tryNative(url, ch, function(){
-        showOv(false,'⚠️', ch?ch.name:'—', 'تعذّر تشغيل البث');
-      });
+  };
+  /* double-tap player = fullscreen */
+  var lastTap=0;
+  document.getElementById('playerWrap').addEventListener('click',function(e){
+    if(e.target===ctrlBar||ctrlBar.contains(e.target)) return;
+    var now=Date.now();
+    if(now-lastTap<300){
+      document.getElementById('cbFs').onclick.call(document.getElementById('cbFs'));
     } else {
-      tryNative(url, ch, function(){
-        if(isHls && window.Hls && Hls.isSupported()){
-          tryHlsJs(url, ch);
-        } else {
-          showOv(false,'⚠️', ch?ch.name:'—', 'تعذّر تشغيل البث — تحقق من الرابط');
-        }
+      if(ovEl.classList.contains('gone')){
+        ctrlBar.classList.add('show');
+        clearTimeout(window._ctrlHide);
+        if(!vid.paused) window._ctrlHide=setTimeout(function(){ctrlBar.classList.remove('show');},4000);
+      }
+    }
+    lastTap=now;
+  });
+
+  document.getElementById('cbPrev').onclick=function(){
+    var list=getList(),idx=list.findIndex(function(c){return c.id===curId;});
+    if(idx>0) playCh(list[idx-1].id);
+  };
+  document.getElementById('cbNext').onclick=function(){
+    var list=getList(),idx=list.findIndex(function(c){return c.id===curId;});
+    if(idx<list.length-1) playCh(list[idx+1].id);
+  };
+
+  /* ── Stream loader ── */
+  function loadStream(url,ch){
+    killHls();
+    document.getElementById('ctrlCh').textContent=ch?ch.name:'—';
+    showOv(true,'📺',ch?ch.name:'...','جاري التحميل...');
+    var isHls=/\.m3u8?$/i.test(url.split('?')[0])||/\/live\//.test(url)||url.indexOf('.m3u8')>-1;
+    if(isHls&&window.Hls&&Hls.isSupported()){
+      tryHlsJs(url,ch);
+    } else {
+      tryNative(url,ch,function(){
+        if(isHls&&window.Hls&&Hls.isSupported()) tryHlsJs(url,ch);
+        else showOv(false,'⚠️',ch?ch.name:'—','تعذّر التشغيل — تحقق من الرابط');
       });
     }
   }
-
-  function tryHlsJs(url, ch){
-    hls = new Hls({
-      enableWorker: false,
-      maxBufferLength: 20,
-      maxMaxBufferLength: 40,
-      fragLoadingTimeOut: 15000,
-      manifestLoadingTimeOut: 15000,
-      levelLoadingTimeOut: 15000
-    });
-    hls.loadSource(url);
-    hls.attachMedia(vid);
-    var started = false;
-    hls.once(Hls.Events.MANIFEST_PARSED, function(){
-      started = true;
-      hideOv();
-      vid.play().catch(function(){});
-    });
-    hls.on(Hls.Events.ERROR, function(ev, d){
-      if(d.fatal){
-        killHls();
-        if(!started){
-          showOv(false,'⚠️', ch?ch.name:'—', 'فشل البث — تحقق من صحة الرابط');
-        }
-      }
-    });
+  function tryHlsJs(url,ch){
+    hls=new Hls({enableWorker:false,maxBufferLength:20,maxMaxBufferLength:40,
+      fragLoadingTimeOut:15000,manifestLoadingTimeOut:15000,levelLoadingTimeOut:15000});
+    hls.loadSource(url); hls.attachMedia(vid);
+    var ok=false;
+    hls.once(Hls.Events.MANIFEST_PARSED,function(){ok=true;hideOv();vid.play().catch(function(){});});
+    hls.on(Hls.Events.ERROR,function(ev,d){if(d.fatal){killHls();if(!ok)showOv(false,'⚠️',ch?ch.name:'—','فشل البث');}});
   }
-
-  function tryNative(url, ch, onFail){
-    vid.oncanplay = null; vid.onerror = null;
-    vid.src = url; vid.load();
-    var done = false;
-    var t = setTimeout(function(){
-      if(!done){ done=true; vid.oncanplay=vid.onerror=null; onFail&&onFail(); }
-    }, 12000);
-    vid.oncanplay = function(){
-      if(done) return; done=true; clearTimeout(t);
-      vid.oncanplay=vid.onerror=null;
-      hideOv(); vid.play().catch(function(){});
-    };
-    vid.onerror = function(){
-      if(done) return; done=true; clearTimeout(t);
-      vid.oncanplay=vid.onerror=null; onFail&&onFail();
-    };
+  function tryNative(url,ch,onFail){
+    vid.oncanplay=null;vid.onerror=null;
+    vid.src=url;vid.load();
+    var done=false,t=setTimeout(function(){if(!done){done=true;vid.oncanplay=vid.onerror=null;onFail&&onFail();}},12000);
+    vid.oncanplay=function(){if(done)return;done=true;clearTimeout(t);vid.oncanplay=vid.onerror=null;hideOv();vid.play().catch(function(){});};
+    vid.onerror=function(){if(done)return;done=true;clearTimeout(t);vid.oncanplay=vid.onerror=null;onFail&&onFail();};
   }
 
   /* ── Channel actions ── */
   function playCh(id){
-    var ch = CHS.find(function(c){ return c.id===id; });
+    var ch=CHS.find(function(c){return c.id===id;});
     if(!ch) return;
-    curId = id;
-    loadStream(ch.url, ch);
-    render();
-    if(window.innerWidth >= 1024) document.getElementById('sidebar').classList.remove('closed');
+    curId=id; loadStream(ch.url,ch); render();
+    if(window.innerWidth>=900) document.getElementById('sidebar').classList.remove('closed');
   }
-
   function toggleFav(id){
-    var i = FAVS.indexOf(id);
-    if(i>-1) FAVS.splice(i,1); else FAVS.push(id);
-    lset(FKEY, FAVS); render();
+    var i=FAVS.indexOf(id);if(i>-1)FAVS.splice(i,1);else FAVS.push(id);
+    lset(FKEY,FAVS);render();
   }
-
-  function setCat(c){ aCat=c; render(); }
-
+  function setCat(c){aCat=c;render();}
   function getList(){
-    var list = CHS.slice();
-    if(favOnly)      list = list.filter(function(c){ return FAVS.indexOf(c.id)>-1; });
-    if(aCat!=='الكل') list = list.filter(function(c){ return c.cat===aCat; });
-    if(srchQ)        list = list.filter(function(c){ return (c.name+' '+(c.cat||'')).toLowerCase().indexOf(srchQ)>-1; });
+    var list=CHS.slice();
+    if(favOnly) list=list.filter(function(c){return FAVS.indexOf(c.id)>-1;});
+    if(aCat!=='الكل') list=list.filter(function(c){return c.cat===aCat;});
+    if(srchQ) list=list.filter(function(c){return(c.name+' '+(c.cat||'')).toLowerCase().indexOf(srchQ)>-1;});
     return list;
   }
 
   /* ── Render ── */
-  function mkLogo(logo, sz){
-    if(logo && logo.trim()){
-      return '<img src="'+esc(logo)+'" onerror="imgErr(this)" style="width:100%;height:100%;object-fit:contain">';
-    }
-    return sz==='big' ? '<span style="font-size:22px">📺</span>' : '📺';
+  function mkLogo(logo,sz){
+    if(logo&&logo.trim()) return '<img src="'+esc(logo)+'" onerror="imgErr(this)" style="width:100%;height:100%;object-fit:contain">';
+    return sz==='big'?'<span style="font-size:22px">📺</span>':'📺';
   }
-
   function render(){
-    var list = getList();
-    var cats = ['الكل'];
-    CHS.forEach(function(c){ if(c.cat && cats.indexOf(c.cat)<0) cats.push(c.cat); });
-
+    var list=getList();
+    var cats=['الكل'];
+    CHS.forEach(function(c){if(c.cat&&cats.indexOf(c.cat)<0)cats.push(c.cat);});
     var ch='';
-    cats.forEach(function(c){
-      ch += '<div class="cat'+(aCat===c?' on':'')+'" data-cat="'+esc(c)+'">'+esc(c)+'</div>';
-    });
-    document.getElementById('cats').innerHTML = ch;
-
+    cats.forEach(function(c){ch+='<div class="cat'+(aCat===c?' on':'')+'" data-cat="'+esc(c)+'" tabindex="0">'+esc(c)+'</div>';});
+    document.getElementById('cats').innerHTML=ch;
     var sb='';
-    if(!list.length){
-      sb='<div class="sb-empty"><div style="font-size:34px">📭</div><div>لا توجد قنوات</div><div style="font-size:10px;margin-top:4px">افتح لوحة التحكم بكتابة bouchta</div></div>';
-    } else {
-      list.forEach(function(c){
-        var on=c.id===curId, fav=FAVS.indexOf(c.id)>-1;
-        sb += '<div class="chi'+(on?' on':'')+'" data-cid="'+esc(c.id)+'">'
-            + '<div class="chi-logo">'+mkLogo(c.logo,'sm')+'</div>'
-            + '<div class="chi-info"><div class="chi-name">'+esc(c.name)+'</div><div class="chi-cat">'+esc(c.cat||'')+'</div></div>'
-            + '<span class="fav-star'+(fav?' on':'')+'" data-fav="'+esc(c.id)+'">'+(fav?'★':'☆')+'</span>'
-            + '</div>';
-      });
-    }
-    document.getElementById('chlist').innerHTML = sb;
-
+    if(!list.length){sb='<div class="sb-empty"><div style="font-size:34px">📭</div><div>لا توجد قنوات</div></div>';}
+    else{list.forEach(function(c){var on=c.id===curId,fav=FAVS.indexOf(c.id)>-1;
+      sb+='<div class="chi'+(on?' on':'')+'" data-cid="'+esc(c.id)+'" tabindex="0">'
+        +'<div class="chi-logo">'+mkLogo(c.logo,'sm')+'</div>'
+        +'<div class="chi-info"><div class="chi-name">'+esc(c.name)+'</div><div class="chi-cat">'+esc(c.cat||'')+'</div></div>'
+        +'<span class="fav-star'+(fav?' on':'')+'" data-fav="'+esc(c.id)+'">'+(fav?'★':'☆')+'</span>'
+        +'</div>';});}
+    document.getElementById('chlist').innerHTML=sb;
     var gr='';
-    if(!list.length){
-      gr='<div class="grid-empty">لا توجد نتائج</div>';
-    } else {
-      list.forEach(function(c){
-        var on=c.id===curId;
-        gr += '<div class="gc'+(on?' on':'')+'" data-cid="'+esc(c.id)+'" tabindex="0">'
-            + '<div class="gc-logo">'+mkLogo(c.logo,'big')+'</div>'
-            + '<div class="gc-name">'+esc(c.name)+'</div>'
-            + '<div class="gc-cat">'+esc(c.cat||'')+'</div>'
-            + '</div>';
-      });
-    }
-    document.getElementById('grid').innerHTML = gr;
-
-    document.getElementById('favBtn').textContent = favOnly ? '★' : '☆';
-    document.getElementById('favBtn').className = 'ibtn' + (favOnly ? ' on' : '');
+    if(!list.length){gr='<div class="grid-empty">لا توجد نتائج</div>';}
+    else{list.forEach(function(c){var on=c.id===curId;
+      gr+='<div class="gc'+(on?' on':'')+'" data-cid="'+esc(c.id)+'" tabindex="0">'
+        +'<div class="gc-logo">'+mkLogo(c.logo,'big')+'</div>'
+        +'<div class="gc-name">'+esc(c.name)+'</div>'
+        +'<div class="gc-cat">'+esc(c.cat||'')+'</div>'
+        +'</div>';});}
+    document.getElementById('grid').innerHTML=gr;
+    document.getElementById('favBtn').textContent=favOnly?'★':'☆';
+    document.getElementById('favBtn').className='ibtn'+(favOnly?' on':'');
   }
+
+  /* ── TV D-pad Navigation (2D grid) ── */
+  function getGridItems(){ return Array.from(document.getElementById('grid').querySelectorAll('.gc')); }
+  function getGridCols(){
+    var items=getGridItems(); if(items.length<2) return 1;
+    var y0=items[0].getBoundingClientRect().top, cols=0;
+    for(var i=0;i<items.length;i++){if(Math.abs(items[i].getBoundingClientRect().top-y0)<5)cols++;else break;}
+    return cols||1;
+  }
+  function focusGrid(idx){
+    var items=getGridItems(); if(!items.length) return;
+    idx=Math.max(0,Math.min(idx,items.length-1));
+    items[idx].focus(); items[idx].scrollIntoView({block:'nearest',behavior:'smooth'});
+  }
+  function curGridIdx(){
+    var items=getGridItems(), f=document.activeElement;
+    return items.indexOf(f);
+  }
+
+  document.addEventListener('keydown',function(e){
+    var admOpen=document.getElementById('admBg').classList.contains('open');
+    if(admOpen){if(e.key==='Escape')closeAdm();return;}
+
+    var inSq=(document.activeElement===document.getElementById('sq'));
+    var key=e.key;
+
+    /* Volume / media keys — always work */
+    if(key==='VolumeUp'||key==='AudioVolumeUp'){e.preventDefault();vid.volume=Math.min(1,vid.volume+0.1);document.getElementById('volSl').value=vid.volume;return;}
+    if(key==='VolumeDown'||key==='AudioVolumeDown'){e.preventDefault();vid.volume=Math.max(0,vid.volume-0.1);document.getElementById('volSl').value=vid.volume;return;}
+    if(key==='VolumeMute'||key==='AudioVolumeMute'){document.getElementById('cbMute').onclick.call(document.getElementById('cbMute'));return;}
+    if(key==='MediaPlayPause'){vid.paused?vid.play():vid.pause();return;}
+    if(key==='MediaTrackNext'||key==='ChannelDown'){document.getElementById('cbNext').onclick();return;}
+    if(key==='MediaTrackPrevious'||key==='ChannelUp'){document.getElementById('cbPrev').onclick();return;}
+
+    if(inSq) return; /* let search field handle typing */
+
+    /* Escape = exit fullscreen or close admin */
+    if(key==='Escape'){
+      if(document.fullscreenElement||document.webkitFullscreenElement){
+        (document.exitFullscreen||document.webkitExitFullscreen).call(document);
+      }
+      return;
+    }
+
+    /* Space/Enter on player = play/pause */
+    if(key===' '&&vid.src&&!document.activeElement.classList.contains('gc')){e.preventDefault();vid.paused?vid.play():vid.pause();return;}
+
+    /* Arrow navigation through grid */
+    if(key==='ArrowDown'||key==='ArrowUp'||key==='ArrowLeft'||key==='ArrowRight'){
+      e.preventDefault();
+      var cols=getGridCols(), idx=curGridIdx();
+      if(idx===-1) idx=0;
+      else if(key==='ArrowDown') idx+=cols;
+      else if(key==='ArrowUp') idx-=cols;
+      else if(key==='ArrowLeft') idx+=1;   /* RTL: left = next */
+      else if(key==='ArrowRight') idx-=1;  /* RTL: right = prev */
+      focusGrid(idx);
+      return;
+    }
+
+    /* Enter/OK on focused grid item = play */
+    if((key==='Enter'||key==='OK')&&document.activeElement.classList.contains('gc')){
+      e.preventDefault();
+      playCh(document.activeElement.dataset.cid);
+      return;
+    }
+  });
 
   /* ── Event Delegation ── */
-  document.getElementById('cats').addEventListener('click', function(e){
-    var el=e.target.closest('[data-cat]'); if(el) setCat(el.dataset.cat);
+  document.getElementById('cats').addEventListener('click',function(e){
+    var el=e.target.closest('[data-cat]');if(el)setCat(el.dataset.cat);
   });
-  document.getElementById('chlist').addEventListener('click', function(e){
+  document.getElementById('cats').addEventListener('keydown',function(e){
+    if(e.key==='Enter'){var el=e.target.closest('[data-cat]');if(el)setCat(el.dataset.cat);}
+  });
+  document.getElementById('chlist').addEventListener('click',function(e){
     var fav=e.target.closest('[data-fav]');
-    if(fav){ e.stopPropagation(); toggleFav(fav.dataset.fav); return; }
-    var item=e.target.closest('[data-cid]'); if(item) playCh(item.dataset.cid);
+    if(fav){e.stopPropagation();toggleFav(fav.dataset.fav);return;}
+    var item=e.target.closest('[data-cid]');if(item)playCh(item.dataset.cid);
   });
-  document.getElementById('grid').addEventListener('click', function(e){
-    var item=e.target.closest('[data-cid]'); if(item) playCh(item.dataset.cid);
+  document.getElementById('chlist').addEventListener('keydown',function(e){
+    if(e.key==='Enter'){var item=e.target.closest('[data-cid]');if(item)playCh(item.dataset.cid);}
   });
-  document.getElementById('grid').addEventListener('keydown', function(e){
-    if(e.key==='Enter'||e.key===' '){
-      var item=e.target.closest('[data-cid]'); if(item){ e.preventDefault(); playCh(item.dataset.cid); }
-    }
+  document.getElementById('grid').addEventListener('click',function(e){
+    var item=e.target.closest('[data-cid]');if(item)playCh(item.dataset.cid);
   });
 
   /* ── Search ── */
   var sq=document.getElementById('sq');
-  sq.addEventListener('input', function(){
+  sq.addEventListener('input',function(){
     var v=this.value;
-    if(v===TRIG){ this.value=''; openAdm(); return; }
-    srchQ=v.toLowerCase().trim(); render();
+    if(v===TRIG){this.value='';openAdm();return;}
+    srchQ=v.toLowerCase().trim();render();
   });
-  sq.addEventListener('keydown', function(e){
-    if(e.key==='Enter'){ e.preventDefault(); sq.blur(); }
-  });
+  sq.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();this.blur();}});
 
   /* ── Header buttons ── */
-  document.getElementById('menuBtn').addEventListener('click', function(){
-    document.getElementById('sidebar').classList.toggle('closed');
-  });
-  document.getElementById('favBtn').addEventListener('click', function(){
-    favOnly=!favOnly; render();
-  });
-
-  /* ── Keyboard / TV D-pad ── */
-  document.addEventListener('keydown', function(e){
-    var adm=document.getElementById('admBg').classList.contains('open');
-    if(adm){ if(e.key==='Escape') closeAdm(); return; }
-    var list=getList(), idx=curId?list.findIndex(function(c){return c.id===curId;}):-1;
-    if(e.key==='ArrowDown'&&idx<list.length-1){ e.preventDefault(); playCh(list[idx+1].id); }
-    else if(e.key==='ArrowUp'&&idx>0){ e.preventDefault(); playCh(list[idx-1].id); }
-    else if((e.key==='Enter'||e.key===' ')&&vid.src){ e.preventDefault(); vid.paused?vid.play():vid.pause(); }
-    else if(e.key==='MediaPlayPause'){ vid.paused?vid.play():vid.pause(); }
-    else if(e.key==='VolumeUp'){ vid.volume=Math.min(1,vid.volume+0.1); document.getElementById('volSl').value=vid.volume; }
-    else if(e.key==='VolumeDown'){ vid.volume=Math.max(0,vid.volume-0.1); document.getElementById('volSl').value=vid.volume; }
-  });
-
-  /* ── Touch on player — show controls briefly ── */
-  document.getElementById('playerWrap').addEventListener('click', function(){
-    if(ovEl.classList.contains('gone')){
-      ctrlBar.classList.add('show');
-      clearTimeout(window._ctrlT);
-      window._ctrlT = setTimeout(function(){
-        if(!vid.paused) ctrlBar.classList.add('show');
-      }, 3000);
-    }
-  });
+  document.getElementById('menuBtn').onclick=function(){document.getElementById('sidebar').classList.toggle('closed');};
+  document.getElementById('favBtn').onclick=function(){favOnly=!favOnly;render();};
 
   /* ── Toast ── */
-  function toast(msg, dur){
-    var t=document.createElement('div'); t.className='toast'; t.textContent=msg;
+  function toast(msg,dur){
+    var t=document.createElement('div');t.className='toast';t.textContent=msg;
     document.body.appendChild(t);
-    setTimeout(function(){ t.parentNode&&t.parentNode.removeChild(t); }, dur||2800);
+    setTimeout(function(){t.parentNode&&t.parentNode.removeChild(t);},dur||2800);
   }
 
   /* ── Admin ── */
-  function openAdm(){ document.getElementById('admBg').classList.add('open'); setStatus(''); }
-  function closeAdm(){ document.getElementById('admBg').classList.remove('open'); }
-  function setStatus(msg,ok){
-    var el=document.getElementById('admStatus');
-    el.textContent=msg; el.style.color=ok?'#22c55e':'var(--muted)';
-  }
+  function openAdm(){document.getElementById('admBg').classList.add('open');setStatus('');}
+  function closeAdm(){document.getElementById('admBg').classList.remove('open');}
+  function setStatus(msg,ok){var el=document.getElementById('admStatus');el.textContent=msg;el.style.color=ok?'#22c55e':'var(--muted)';}
+  document.getElementById('closeAdm').onclick=closeAdm;
+  document.getElementById('admBg').addEventListener('click',function(e){if(e.target===this)closeAdm();});
 
-  document.getElementById('closeAdm').addEventListener('click',closeAdm);
-  document.getElementById('admBg').addEventListener('click',function(e){ if(e.target===this) closeAdm(); });
+  /* ── Sync between devices ── */
+  function getExportCode(){
+    try{return btoa(unescape(encodeURIComponent(JSON.stringify(CHS))));}catch(e){return '';}
+  }
+  function importFromCode(code){
+    try{
+      code=code.trim().replace(/\s+/g,'');
+      var json=decodeURIComponent(escape(atob(code)));
+      var chs=JSON.parse(json);
+      if(!Array.isArray(chs)||!chs.length) throw new Error('invalid');
+      return chs;
+    }catch(e){return null;}
+  }
+  document.getElementById('syncExportBtn').onclick=function(){
+    var code=getExportCode();
+    if(!code){toast('لا توجد قنوات للتصدير');return;}
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(code).then(function(){toast('✓ تم نسخ رمز المزامنة ('+CHS.length+' قناة)');}).catch(function(){fallbackCopy(code);});
+    } else {fallbackCopy(code);}
+  };
+  function fallbackCopy(text){
+    var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.top='-9999px';
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');toast('✓ تم نسخ رمز المزامنة');}catch(e){toast('❌ لم يتم النسخ تلقائياً — انسخ الرمز يدوياً');}
+    document.body.removeChild(ta);
+  }
+  document.getElementById('syncShowImport').onclick=function(){
+    var w=document.getElementById('syncImportWrap');
+    w.style.display=w.style.display==='none'?'block':'none';
+  };
+  document.getElementById('doSyncImport').onclick=function(){
+    var code=document.getElementById('syncCodeIn').value;
+    if(!code.trim()){setStatus('أدخل رمز المزامنة');return;}
+    var chs=importFromCode(code);
+    if(!chs){setStatus('❌ رمز غير صالح');return;}
+    CHS=chs;lset(KEY,CHS);aCat='الكل';favOnly=false;srchQ='';sq.value='';render();
+    document.getElementById('syncCodeIn').value='';
+    document.getElementById('syncImportWrap').style.display='none';
+    setStatus('✓ تم استيراد '+CHS.length+' قناة',true);
+    toast('✓ مزامنة ناجحة — '+CHS.length+' قناة');
+    closeAdm();
+  };
 
   /* ── M3U Parser ── */
   function parseM3u(text){
-    var lines=text.split('\n'), out=[], cur=null;
+    var lines=text.split('\n'),out=[],cur=null;
     lines.forEach(function(line){
       line=line.trim();
       if(line.startsWith('#EXTINF')){
-        cur={id:nextId(),name:'',url:'',cat:'عام',logo:'',ar:''};
-        var nm=line.match(/,(.+)$/); if(nm) cur.name=nm[1].trim();
-        var lg=line.match(/tvg-logo="([^"]*)"/); if(lg) cur.logo=lg[1];
-        var ct=line.match(/group-title="([^"]*)"/); if(ct) cur.cat=ct[1]||'عام';
-      } else if(line&&!line.startsWith('#')&&cur){
-        cur.url=line; out.push(cur); cur=null;
-      }
+        cur={id:nextId(),name:'',url:'',cat:'عام',logo:''};
+        var nm=line.match(/,(.+)$/);if(nm)cur.name=nm[1].trim();
+        var lg=line.match(/tvg-logo="([^"]*)"/);if(lg)cur.logo=lg[1];
+        var ct=line.match(/group-title="([^"]*)"/);if(ct)cur.cat=ct[1]||'عام';
+      } else if(line&&!line.startsWith('#')&&cur){cur.url=line;out.push(cur);cur=null;}
     });
     return out;
   }
-
   function fetchWithFallback(url){
-    return fetch(url).catch(function(){
-      return fetch('https://corsproxy.io/?'+encodeURIComponent(url));
-    });
+    return fetch(url).catch(function(){return fetch('https://corsproxy.io/?'+encodeURIComponent(url));});
   }
 
   /* ── Import M3U ── */
-  document.getElementById('importM3u').addEventListener('click', function(){
+  document.getElementById('importM3u').onclick=function(){
     var url=document.getElementById('m3uUrl').value.trim();
-    if(!url){ setStatus('أدخل رابط M3U'); return; }
+    if(!url){setStatus('أدخل رابط M3U');return;}
     setStatus('⏳ جاري الاستيراد...');
-    fetchWithFallback(url).then(function(r){ return r.text(); }).then(function(text){
+    fetchWithFallback(url).then(function(r){return r.text();}).then(function(text){
       var chs=parseM3u(text);
-      if(!chs.length){ setStatus('لم تُعثر على قنوات'); return; }
-      CHS=chs; lset(KEY,CHS); aCat='الكل'; render();
-      setStatus('✓ تم استيراد '+chs.length+' قناة', true);
-      toast('✓ '+chs.length+' قناة مستوردة');
-      closeAdm();
-    }).catch(function(e){ setStatus('خطأ: '+e.message); });
-  });
+      if(!chs.length){setStatus('لم تُعثر على قنوات');return;}
+      CHS=chs;lset(KEY,CHS);aCat='الكل';render();
+      setStatus('✓ تم استيراد '+chs.length+' قناة',true);
+      toast('✓ '+chs.length+' قناة');closeAdm();
+    }).catch(function(e){setStatus('خطأ: '+e.message);});
+  };
 
   /* ── Import Xtream ── */
-  document.getElementById('xcImport').addEventListener('click', function(){
+  document.getElementById('xcImport').onclick=function(){
     var srv=document.getElementById('xcSrv').value.trim().replace(/\/$/,'');
     var usr=document.getElementById('xcUser').value.trim();
     var pas=document.getElementById('xcPass').value.trim();
-    if(!srv||!usr||!pas){ setStatus('أدخل السيرفر والمستخدم وكلمة المرور'); return; }
+    if(!srv||!usr||!pas){setStatus('أدخل السيرفر والمستخدم وكلمة المرور');return;}
     var url=srv+'/get.php?username='+encodeURIComponent(usr)+'&password='+encodeURIComponent(pas)+'&type=m3u_plus&output=ts';
     setStatus('⏳ جاري الاستيراد...');
-    fetchWithFallback(url).then(function(r){ return r.text(); }).then(function(text){
+    fetchWithFallback(url).then(function(r){return r.text();}).then(function(text){
       if(!text.includes('#EXTINF')) throw new Error('استجابة غير صالحة');
-      var chs=parseM3u(text);
-      if(!chs.length) throw new Error('لم تُعثر على قنوات');
-      CHS=chs; lset(KEY,CHS); aCat='الكل'; render();
-      setStatus('✓ تم استيراد '+chs.length+' قناة', true);
-      toast('✓ '+chs.length+' قناة');
-      closeAdm();
-    }).catch(function(e){ setStatus('خطأ: '+e.message); });
-  });
+      var chs=parseM3u(text);if(!chs.length) throw new Error('لم تُعثر على قنوات');
+      CHS=chs;lset(KEY,CHS);aCat='الكل';render();
+      setStatus('✓ تم استيراد '+chs.length+' قناة',true);toast('✓ '+chs.length+' قناة');closeAdm();
+    }).catch(function(e){setStatus('خطأ: '+e.message);});
+  };
 
-  /* ── Add channel — FIX: reset filter + close panel immediately ── */
-  document.getElementById('addCh').addEventListener('click', function(){
+  /* ── Add channel ── */
+  document.getElementById('addCh').onclick=function(){
     var name=document.getElementById('aName').value.trim();
     var url=document.getElementById('aUrl').value.trim();
-    var cat=document.getElementById('aCat').value.trim()||'عام';
+    var cat=document.getElementById('aCatIn').value.trim()||'عام';
     var logo=document.getElementById('aLogo').value.trim();
-    if(!name||!url){ setStatus('أدخل الاسم والرابط'); return; }
-    var newCh = {id:nextId(),name:name,url:url,cat:cat,logo:logo,ar:''};
-    CHS.push(newCh);
-    lset(KEY,CHS);
-    // Reset filter so new channel is visible
-    aCat = 'الكل';
-    favOnly = false;
-    srchQ = '';
-    sq.value = '';
-    render();
-    // Clear fields
+    if(!name||!url){setStatus('أدخل الاسم والرابط');return;}
+    CHS.push({id:nextId(),name:name,url:url,cat:cat,logo:logo});
+    lset(KEY,CHS);aCat='الكل';favOnly=false;srchQ='';sq.value='';render();
     document.getElementById('aName').value='';
     document.getElementById('aUrl').value='';
     document.getElementById('aLogo').value='';
-    document.getElementById('aCat').value='عام';
-    setStatus('✓ تمت الإضافة — اضغط ✕ لرؤية القناة', true);
-    toast('✓ القناة أُضيفت');
-  });
+    setStatus('✓ تمت الإضافة',true);toast('✓ القناة أُضيفت');closeAdm();
+  };
 
-  /* ── Export ── */
-  document.getElementById('expBtn').addEventListener('click', function(){
+  /* ── Export JSON ── */
+  document.getElementById('expBtn').onclick=function(){
     var b=new Blob([JSON.stringify(CHS,null,2)],{type:'application/json'});
-    var a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='mus-channels.json'; a.click();
-  });
+    var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='mus-channels.json';a.click();
+  };
 
   /* ── Clear ── */
-  document.getElementById('clrBtn').addEventListener('click', function(){
+  document.getElementById('clrBtn').onclick=function(){
     if(!confirm('مسح كل القنوات؟')) return;
-    CHS=[]; lset(KEY,CHS); killHls(); curId=null;
+    CHS=[];lset(KEY,CHS);killHls();curId=null;
     ctrlBar.classList.remove('show');
     showOv(false,'▶','MUS Player','اختر قناة للبدء');
-    render(); toast('تم المسح');
-  });
+    render();toast('تم المسح');
+  };
 
   /* ── Boot ── */
   render();
   showOv(false,'▶','MUS Player','اختر قناة للبدء');
-  if(window.innerWidth >= 1024) document.getElementById('sidebar').classList.remove('closed');
+  var isTV=(window.innerWidth>=1024);
+  if(isTV) document.getElementById('sidebar').classList.remove('closed');
   if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
+  /* Auto-focus first grid item on TV */
+  if(isTV) setTimeout(function(){focusGrid(0);},300);
   </script>
   </body>
   </html>
