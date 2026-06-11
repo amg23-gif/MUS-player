@@ -253,19 +253,36 @@
     <div style="font-size:11px;color:var(--text);font-weight:600;margin-bottom:8px">📋 إدارة القنوات (<span id="chCount">0</span>)</div>
     <div class="chmgr" id="chmgr"></div>
 
-    <hr class="sep">
-    <!-- Sync -->
-    <div style="font-size:11px;color:var(--text);font-weight:600;margin-bottom:8px">📲 مزامنة بين الأجهزة</div>
-    <div class="ab-row">
-      <button class="ab s" id="btnSyncExp" style="flex:1">📤 نسخ رمز المزامنة</button>
-      <button class="ab s" id="btnSyncImpShow" style="flex:1">📥 استيراد رمز</button>
-    </div>
-    <div class="f" id="syncImpWrap" style="display:none;margin-top:8px">
-      <label>الصق رمز المزامنة</label>
-      <textarea id="syncIn" placeholder="الصق الرمز هنا..."></textarea>
-      <button class="ab p" style="width:100%;margin-top:6px" id="btnSyncDo">✓ تطبيق</button>
-    </div>
-
+      <hr class="sep">
+      <!-- Cloud Sync -->
+      <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.25);border-radius:9px;padding:12px">
+        <div style="font-size:12px;color:var(--green);font-weight:700;margin-bottom:6px">☁️ مزامنة تلقائية بين الأجهزة</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.5">شارك رمز الغرفة مع أجهزتك الأخرى — ستُزامَن القنوات كل 30 ثانية</div>
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">
+          <div id="roomCodeDisp" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:9px;font-family:monospace;font-size:22px;letter-spacing:6px;text-align:center;font-weight:700"></div>
+          <button class="ab s" id="btnCopyRoom">📋 نسخ</button>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:6px">
+          <input id="joinRoom" type="text" maxlength="10" placeholder="رمز غرفة أخرى للانضمام..." style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:14px;outline:none;font-family:monospace;letter-spacing:2px;text-transform:uppercase">
+          <button class="ab p" id="btnJoinRoom">انضمام</button>
+        </div>
+        <div id="syncStatus" style="font-size:11px;color:var(--muted);text-align:center;min-height:16px"></div>
+      </div>
+      <div class="f" style="margin-top:10px">
+        <label>🔗 رابط سيرفر المزامنة (اضبطه مرة واحدة على كل جهاز)</label>
+        <div style="display:flex;gap:6px">
+          <input id="apiUrlInp" type="url" placeholder="https://your-app.replit.app/api" dir="ltr" style="flex:1">
+          <button class="ab s" id="btnApiSave">حفظ</button>
+        </div>
+      </div>
+      <div class="f">
+        <label>🔑 تغيير كلمة مرور لوحة التحكم</label>
+        <div style="display:flex;gap:6px">
+          <input id="newPw" type="password" placeholder="كلمة المرور الجديدة..." style="flex:1">
+          <button class="ab s" id="btnPwSave">حفظ</button>
+        </div>
+      </div>
+  
     <hr class="sep">
     <div class="ab-row">
       <button class="ab s" id="btnExp">💾 تصدير JSON</button>
@@ -297,7 +314,7 @@
   </div>
 
   <script>
-  var TRIG='bouchta', KEY='mus_v2', FKEY='mus_fav';
+  var TRIG=lget('mus_pw','bouchta'), KEY='mus_v2', FKEY='mus_fav';
   function lget(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
   function lset(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
   function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -311,6 +328,44 @@
   var CHS=(function(){var a=lget(KEY,null);return(Array.isArray(a)&&a.length)?a:defChs();})();
   var FAVS=lget(FKEY,[]);
   var curId=null,aCat='الكل',sq_v='',favOnly=false,hls=null,ctrlTimer=null;
+
+    /* ── Cloud Sync ── */
+    var API_URL=lget('mus_api_url','');
+    var ROOM_KEY='mus_room_v1';
+    var LAST_TS_KEY='mus_last_ts';
+    var syncBusy=false;
+    var roomId=(function(){
+      var r=lget(ROOM_KEY,null);
+      if(!r){r=Array.from({length:6},function(){return'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random()*36)];}).join('');lset(ROOM_KEY,r);}
+      return r;
+    })();
+
+    function updateSyncStatus(msg){var el=document.getElementById('syncStatus');if(el)el.textContent=msg;}
+    function updateRoomDisplay(){var el=document.getElementById('roomCodeDisp');if(el)el.textContent=roomId;}
+
+    function syncPush(){
+      if(!API_URL||!roomId)return;
+      fetch(API_URL+'/sync/'+roomId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({channels:CHS})})
+        .then(function(r){return r.json();}).then(function(){lset(LAST_TS_KEY,Date.now());updateSyncStatus('✓ مزامن — '+new Date().toLocaleTimeString('ar'));})
+        .catch(function(){updateSyncStatus('⚠ تعذّرت المزامنة');});
+    }
+
+    function syncPull(silent){
+      if(!API_URL||!roomId||syncBusy)return;
+      syncBusy=true;
+      fetch(API_URL+'/sync/'+roomId)
+        .then(function(r){return r.json();})
+        .then(function(d){
+          syncBusy=false;
+          if(d.channels&&Array.isArray(d.channels)&&d.updatedAt&&d.channels.length>0){
+            var srvTs=new Date(d.updatedAt).getTime();
+            var localTs=lget(LAST_TS_KEY,0);
+            if(srvTs>localTs){CHS=d.channels;lset(KEY,CHS);lset(LAST_TS_KEY,srvTs);render();try{renderChmgr();}catch(e){}if(!silent)toast('🔄 تم تحديث القنوات من جهاز آخر');}
+          }
+          updateSyncStatus('✓ مزامن — '+new Date().toLocaleTimeString('ar'));
+        })
+        .catch(function(){syncBusy=false;if(!API_URL)updateSyncStatus('⚪ المزامنة غير مفعّلة — أدخل رابط السيرفر');else updateSyncStatus('⚠ لا اتصال بالسيرفر');});
+    }
 
   var vid=document.getElementById('vid');
   var ov=document.getElementById('ov');
@@ -442,7 +497,7 @@
     var idx=CHS.findIndex(function(c){return c.id===id;});if(idx<0)return;
     var name=CHS[idx].name;
     if(!confirm('حذف "'+name+'"؟'))return;
-    CHS.splice(idx,1);lset(KEY,CHS);
+    CHS.splice(idx,1);lset(KEY,CHS);syncPush();
     if(curId===id){curId=null;killHls();showOv(false,'▶','MUS Player','اختر قناة للبدء');}
     render();renderChmgr();toast('✓ تم حذف "'+name+'"');
   }
@@ -612,14 +667,14 @@
     ch.cat=document.getElementById('eCat').value.trim()||ch.cat;
     ch.url=document.getElementById('eUrl').value.trim()||ch.url;
     ch.logo=document.getElementById('eLogo').value.trim();
-    lset(KEY,CHS);render();renderChmgr();closeEdit();toast('✓ تم الحفظ');
+    lset(KEY,CHS);syncPush();render();renderChmgr();closeEdit();toast('✓ تم الحفظ');
   };
 
   /* ── Add channel ── */
   document.getElementById('btnAdd').onclick=function(){
     var n=document.getElementById('aN').value.trim(),u=document.getElementById('aUrl').value.trim(),cat=document.getElementById('aCat').value.trim()||'عام',logo=document.getElementById('aLogo').value.trim();
     if(!n||!u){setSt('أدخل الاسم والرابط');return;}
-    CHS.push({id:nid(),name:n,url:u,cat:cat,logo:logo});lset(KEY,CHS);
+    CHS.push({id:nid(),name:n,url:u,cat:cat,logo:logo});lset(KEY,CHS);syncPush();
     document.getElementById('aN').value='';document.getElementById('aUrl').value='';document.getElementById('aLogo').value='';
     aCat='الكل';render();renderChmgr();setSt('✓ تمت الإضافة',true);toast('✓ القناة أُضيفت');
   };
@@ -647,7 +702,7 @@
     setSt('⏳ جاري الاستيراد...');
     fetchM3u(url).then(function(r){return r.text();}).then(function(text){
       var chs=parseM3u(text);if(!chs.length){setSt('لم تُعثر على قنوات');return;}
-      CHS=chs;lset(KEY,CHS);aCat='الكل';render();renderChmgr();setSt('✓ '+chs.length+' قناة',true);toast('✓ '+chs.length+' قناة');closeAdm();
+      CHS=chs;lset(KEY,CHS);syncPush();aCat='الكل';render();renderChmgr();setSt('✓ '+chs.length+' قناة',true);toast('✓ '+chs.length+' قناة');closeAdm();
     }).catch(function(e){setSt('خطأ: '+e.message);});
   };
 
@@ -659,7 +714,7 @@
     fetchM3u(url).then(function(r){return r.text();}).then(function(text){
       if(!text.includes('#EXTINF'))throw new Error('استجابة غير صالحة');
       var chs=parseM3u(text);if(!chs.length)throw new Error('لا قنوات');
-      CHS=chs;lset(KEY,CHS);aCat='الكل';render();renderChmgr();setSt('✓ '+chs.length+' قناة',true);toast('✓ '+chs.length+' قناة');closeAdm();
+      CHS=chs;lset(KEY,CHS);syncPush();aCat='الكل';render();renderChmgr();setSt('✓ '+chs.length+' قناة',true);toast('✓ '+chs.length+' قناة');closeAdm();
     }).catch(function(e){setSt('خطأ: '+e.message);});
   };
 
@@ -678,7 +733,7 @@
   document.getElementById('btnSyncDo').onclick=function(){
     var chs=applyCode(document.getElementById('syncIn').value);
     if(!chs){setSt('❌ رمز غير صالح');return;}
-    CHS=chs;lset(KEY,CHS);aCat='الكل';favOnly=false;sq_v='';sqEl.value='';render();renderChmgr();
+    CHS=chs;lset(KEY,CHS);syncPush();aCat='الكل';favOnly=false;sq_v='';sqEl.value='';render();renderChmgr();
     document.getElementById('syncIn').value='';document.getElementById('syncImpWrap').style.display='none';
     setSt('✓ تم استيراد '+CHS.length+' قناة',true);toast('✓ مزامنة '+CHS.length+' قناة');closeAdm();
   };
@@ -705,6 +760,47 @@
       _lt++;clearTimeout(_ltm);_ltm=setTimeout(function(){_lt=0;},1500);
       if(_lt>=5){_lt=0;openAdm();}
     });
+  
+    /* ── Cloud Sync Handlers ── */
+    document.getElementById('btnCopyRoom').onclick=function(){
+      updateRoomDisplay();
+      if(navigator.clipboard){navigator.clipboard.writeText(roomId).then(function(){toast('✓ تم نسخ رمز الغرفة: '+roomId);});}
+      else{var t=document.createElement('textarea');t.value=roomId;document.body.appendChild(t);t.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(t);toast('✓ تم النسخ: '+roomId);}
+    };
+
+    document.getElementById('btnJoinRoom').onclick=function(){
+      var code=document.getElementById('joinRoom').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+      if(!code||code.length<4){toast('أدخل رمزاً صالحاً (4-10 أحرف أو أرقام)');return;}
+      roomId=code;lset(ROOM_KEY,roomId);
+      updateRoomDisplay();
+      document.getElementById('joinRoom').value='';
+      lset(LAST_TS_KEY,0);
+      updateSyncStatus('⏳ جاري المزامنة...');
+      syncPull(false);
+      toast('🔄 تم الانضمام إلى الغرفة: '+roomId);
+    };
+
+    document.getElementById('btnApiSave').onclick=function(){
+      var url=document.getElementById('apiUrlInp').value.trim().replace(//+$/,'');
+      if(url&&!url.startsWith('http')){toast('الرابط يجب أن يبدأ بـ http');return;}
+      API_URL=url;lset('mus_api_url',url);
+      if(url){lset(LAST_TS_KEY,0);syncPull(false);toast('✓ تم حفظ الرابط — جاري المزامنة...');}
+      else{toast('تم مسح رابط السيرفر');}
+      updateSyncStatus(url?'⏳ جاري المزامنة...':'⚪ لا يوجد سيرفر');
+    };
+
+    document.getElementById('btnPwSave').onclick=function(){
+      var pw=document.getElementById('newPw').value.trim();
+      if(!pw||pw.length<3){toast('كلمة المرور يجب أن تكون 3 أحرف على الأقل');return;}
+      TRIG=pw;lset('mus_pw',pw);
+      document.getElementById('newPw').value='';
+      toast('✓ تم تغيير كلمة المرور');
+    };
+
+    /* ── Start sync ── */
+    syncPull(true);
+    setInterval(function(){syncPull(true);},30000);
+
   </script>
   </body>
   </html>
