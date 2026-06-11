@@ -1,4 +1,4 @@
-const CACHE='mus-v4';
+const CACHE='mus-v5';
   const SHELL=['/MUS-player/','/MUS-player/index.html','/MUS-player/manifest.json'];
   self.addEventListener('install',e=>{
     e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting()));
@@ -9,19 +9,15 @@ const CACHE='mus-v4';
   self.addEventListener('fetch',e=>{
     if(e.request.method!=='GET')return;
     const url=new URL(e.request.url);
-    /* never cache stream requests */
-    if(url.pathname.endsWith('.m3u8')||url.pathname.endsWith('.ts'))return;
+    if(url.pathname.endsWith('.m3u8')||url.pathname.endsWith('.ts')||url.pathname.endsWith('.m3u'))return;
     e.respondWith(
-      caches.match(e.request).then(cached=>{
-        if(cached)return cached;
-        return fetch(e.request).then(res=>{
-          if(res&&res.status===200&&res.type==='basic'){
-            const clone=res.clone();
-            caches.open(CACHE).then(c=>c.put(e.request,clone));
-          }
-          return res;
-        }).catch(()=>caches.match('/MUS-player/'));
-      })
+      fetch(e.request).then(res=>{
+        if(res&&res.status===200&&res.type==='basic'){
+          const clone=res.clone();
+          caches.open(CACHE).then(c=>c.put(e.request,clone));
+        }
+        return res;
+      }).catch(()=>caches.match(e.request).then(c=>c||caches.match('/MUS-player/')))
     );
   });
   
