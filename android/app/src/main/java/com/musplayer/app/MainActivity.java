@@ -36,16 +36,23 @@ package com.musplayer.app;
           settings.setUseWideViewPort(true);
           settings.setBuiltInZoomControls(false);
           settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+          // Allow HTTP streams inside HTTPS pages (fixes mixed content blocking)
+          settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
           settings.setUserAgentString(
-              "Mozilla/5.0 (Linux; Android 12; Tablet) AppleWebKit/537.36 " +
-              "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+              "Mozilla/5.0 (Linux; Android 12; MUSPlayer) AppleWebKit/537.36 " +
+              "(KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
           );
 
           webView.setWebChromeClient(new WebChromeClient());
           webView.setWebViewClient(new WebViewClient() {
               @Override
               public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                  return false;
+                  String url = request.getUrl().toString();
+                  // Block intent:// URLs — they cause "webpage not available" error
+                  if (url.startsWith("intent://") || url.startsWith("market://")) {
+                      return true; // Block navigation, do nothing
+                  }
+                  return false; // Allow all other URLs
               }
           });
 
@@ -71,6 +78,12 @@ package com.musplayer.app;
       protected void onResume() {
           super.onResume();
           webView.onResume();
+          // Re-apply immersive mode on resume
+          getWindow().getDecorView().setSystemUiVisibility(
+              View.SYSTEM_UI_FLAG_FULLSCREEN |
+              View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+              View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+          );
       }
   }
   
