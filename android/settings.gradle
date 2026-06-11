@@ -1,0 +1,3 @@
+rootProject.name = "MUSPlayer"
+  include ':app'
+  
