@@ -509,11 +509,17 @@
 
   /* ── Search ── */
   var sqEl=document.getElementById('sq');
-  sqEl.addEventListener('input',function(){
-    if(this.value===TRIG){this.value='';openAdm();return;}
-    sq_v=this.value.toLowerCase().trim();render();
-  });
-  sqEl.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();this.blur();}});
+  /* ── Admin trigger: case-insensitive, fires on input + keyup + Enter ── */
+    function chkTrig(v){
+      if(!v)return false;
+      if(v.trim().toLowerCase()===TRIG.toLowerCase()){
+        sqEl.value='';sq_v='';render();openAdm();return true;
+      }
+      return false;
+    }
+    sqEl.addEventListener('input',function(){if(!chkTrig(this.value)){sq_v=this.value.toLowerCase().trim();render();}});
+    sqEl.addEventListener('keyup',function(){chkTrig(this.value);});
+    sqEl.addEventListener('keydown',function(e){if(e.key==='Enter'){if(!chkTrig(this.value)){e.preventDefault();this.blur();}}});
   document.getElementById('btnMenu').onclick=function(){document.getElementById('sidebar').classList.toggle('closed');};
   document.getElementById('btnFav').onclick=function(){favOnly=!favOnly;render();};
 
@@ -693,6 +699,12 @@
   var isTV=window.innerWidth>=1024;
   if(isTV){document.getElementById('sidebar').classList.remove('closed');setTimeout(function(){focusGc(0);},400);}
   if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
+    /* Logo 5-tap = open admin (backup) */
+    var _lt=0,_ltm=null;
+    document.querySelector('.logo').addEventListener('click',function(){
+      _lt++;clearTimeout(_ltm);_ltm=setTimeout(function(){_lt=0;},1500);
+      if(_lt>=5){_lt=0;openAdm();}
+    });
   </script>
   </body>
   </html>
