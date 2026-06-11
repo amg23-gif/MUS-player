@@ -5,6 +5,9 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -35,18 +38,20 @@ jobs:
           cd android
           ./gradlew assembleRelease --no-daemon
 
-      - name: Find and Upload APK
+      - name: Prepare APK
         run: |
-          echo '=== APK files found ==='
-          find android/app/build/outputs/apk -name '*.apk' -type f
           mkdir -p output
           find android/app/build/outputs/apk -name '*.apk' -type f -exec cp {} output/MUS-Player.apk \;
-          echo 'APK copied successfully'
           ls -lh output/
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: MUS-Player-APK
-          path: output/MUS-Player.apk
-          retention-days: 30
+          tag_name: v1.0
+          name: MUS Player v1.0
+          body: |
+            مشغّل IPTV للهاتف والتلفاز
+            حمّل ملف MUS-Player.apk وثبّته على جهازك
+          files: output/MUS-Player.apk
+          make_latest: true
+          overwrite_release_files: true
