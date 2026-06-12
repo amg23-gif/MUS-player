@@ -579,8 +579,8 @@
     sqEl.addEventListener('keydown',function(e){if(e.key==='Enter'){if(!chkTrig(this.value)){e.preventDefault();this.blur();}}});
   document.getElementById('btnMenu').onclick=function(){document.getElementById('sidebar').classList.toggle('closed');};
   document.getElementById('btnFav').onclick=function(){favOnly=!favOnly;render();};
-  document.getElementById('btnAdm').onclick=function(){openAdm();};
-  document.getElementById('btnAdm').addEventListener('touchstart',function(e){e.preventDefault();openAdm();},{passive:false});
+  document.getElementById('btnAdm').onclick=function(){window.location.href='panel.html';};
+  document.getElementById('btnAdm').addEventListener('touchstart',function(e){e.preventDefault();window.location.href='panel.html';},{passive:false});
 
   /* ── TV D-pad navigation ── */
   function gridItems(){return Array.from(document.getElementById('grid').querySelectorAll('.gc'));}
