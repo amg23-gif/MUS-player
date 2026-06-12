@@ -1,4 +1,4 @@
-const CACHE='mus-v8';
+const CACHE='mus-v10';
   const SHELL=[
     '/MUS-player/',
     '/MUS-player/index.html',
