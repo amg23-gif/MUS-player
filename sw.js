@@ -1,4 +1,4 @@
-// Service Worker معطّل — يمنع أي كاش قديم
+// v267-ma — Service Worker يمنع أي كاش قديم
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', e => {
   e.waitUntil(
