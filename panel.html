@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>⚙️ MUS Player — لوحة التحكم</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#07090f;--bg2:#0e1117;--bg3:#151821;--acc:#e00;--text:#e8eaf0;--muted:#555b6e;--border:#1e2233;--green:#22c55e}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;font-size:14px;padding:16px;max-width:600px;margin:0 auto}
+h1{font-size:16px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px}
+.card h2{font-size:13px;color:var(--muted);margin-bottom:12px;font-weight:600}
+label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
+input,textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;outline:none;margin-bottom:10px;direction:ltr}
+input:focus,textarea:focus{border-color:var(--acc)}
+textarea{height:60px;resize:none;font-size:11px;font-family:monospace}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row>*{flex:1;min-width:120px}
+button{padding:9px 16px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:700;transition:opacity .15s}
+button:hover{opacity:.85}
+.btn-p{background:var(--acc);color:#fff}
+.btn-s{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+.btn-d{background:#4a0808;color:#ff8a8a}
+.btn-g{background:#14532d;color:#86efac}
+.status{font-size:12px;padding:8px 12px;border-radius:7px;margin-top:8px;min-height:36px}
+.status.ok{background:rgba(34,197,94,.1);color:var(--green)}
+.status.err{background:rgba(230,32,32,.1);color:#ff6060}
+.status.info{background:rgba(255,255,255,.05);color:var(--muted)}
+.chlist{max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;background:var(--bg3)}
+.chi{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border)}
+.chi:last-child{border:none}
+.chi-n{flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chi-cat{font-size:10px;color:var(--muted)}
+.del-btn{background:none;border:none;color:#ff6060;cursor:pointer;font-size:14px;padding:2px 6px}
+.count{font-size:11px;color:var(--muted)}
+.sep{border:none;border-top:1px solid var(--border);margin:4px 0 12px}
+.open-btn{display:block;width:100%;padding:14px;background:var(--acc);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;margin-bottom:16px}
+</style>
+</head>
+<body>
+<h1>⚙️ لوحة التحكم — MUS Player</h1>
+
+<a class="open-btn" id="openApp" href="/MUS-player/">▶ فتح التطبيق</a>
+
+<!-- M3U -->
+<div class="card">
+  <h2>📥 استيراد M3U</h2>
+  <label>رابط M3U</label>
+  <input id="m3uUrl" type="url" placeholder="http://server/get.php?username=...&type=m3u_plus">
+  <button class="btn-p" onclick="importM3U()">📥 استيراد</button>
+  <div class="status info" id="m3uSt">جاهز</div>
+</div>
+
+<!-- Xtream -->
+<div class="card">
+  <h2>🔗 Xtream Codes</h2>
+  <div class="row">
+    <div><label>السيرفر</label><input id="xcSrv" placeholder="http://server:8080"></div>
+    <div><label>المستخدم</label><input id="xcU"></div>
+    <div><label>كلمة المرور</label><input id="xcP"></div>
+  </div>
+  <button class="btn-p" onclick="importXtream()">🔗 استيراد Xtream</button>
+  <div class="status info" id="xcSt">جاهز</div>
+</div>
+
+<!-- Add manually -->
+<div class="card">
+  <h2>➕ إضافة قناة يدوياً</h2>
+  <div class="row">
+    <div><label>الاسم</label><input id="aN" placeholder="اسم القناة"></div>
+    <div><label>التصنيف</label><input id="aCat" placeholder="عام" value="عام"></div>
+  </div>
+  <label>رابط البث (.m3u8)</label>
+  <input id="aUrl" placeholder="https://...">
+  <button class="btn-g" onclick="addCh()">➕ إضافة</button>
+</div>
+
+<!-- Channels list -->
+<div class="card">
+  <h2>📋 القنوات <span class="count" id="cnt"></span></h2>
+  <div class="chlist" id="chlist"><div style="padding:12px;color:var(--muted);font-size:12px;text-align:center">لا توجد قنوات</div></div>
+  <hr class="sep">
+  <div class="row" style="margin-top:4px">
+    <button class="btn-s" onclick="exportJSON()">💾 تصدير</button>
+    <button class="btn-d" onclick="clearAll()">🗑️ مسح الكل</button>
+  </div>
+</div>
+
+<script>
+var KEY='mus_v2';
+function load(){try{var a=localStorage.getItem(KEY);return(a&&JSON.parse(a))||[];}catch(e){return[];}}
+function save(a){try{localStorage.setItem(KEY,JSON.stringify(a));}catch(e){}}
+function nid(){return Date.now()+'-'+Math.random().toString(36).slice(2,5);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function render(){
+  var chs=load();
+  document.getElementById('cnt').textContent='('+chs.length+')';
+  if(!chs.length){document.getElementById('chlist').innerHTML='<div style="padding:12px;color:var(--muted);font-size:12px;text-align:center">لا توجد قنوات</div>';return;}
+  document.getElementById('chlist').innerHTML=chs.map(function(c,i){
+    return'<div class="chi"><div class="chi-n">'+esc(c.name)+'<span class="chi-cat"> — '+esc(c.cat||'')+'</span></div><button class="del-btn" onclick="delCh(\''+esc(c.id)+'\')">✕</button></div>';
+  }).join('');
+}
+
+function delCh(id){var chs=load().filter(function(c){return c.id!==id;});save(chs);render();}
+function clearAll(){if(confirm('مسح جميع القنوات؟')){save([]);render();}}
+
+function addCh(){
+  var n=document.getElementById('aN').value.trim();
+  var u=document.getElementById('aUrl').value.trim();
+  var cat=document.getElementById('aCat').value.trim()||'عام';
+  if(!n||!u){alert('أدخل الاسم والرابط');return;}
+  var chs=load();
+  chs.push({id:nid(),name:n,url:u,cat:cat,logo:''});
+  save(chs);render();
+  document.getElementById('aN').value='';
+  document.getElementById('aUrl').value='';
+}
+
+function st(id,msg,type){var el=document.getElementById(id);el.textContent=msg;el.className='status '+(type||'info');}
+
+function importM3U(){
+  var url=document.getElementById('m3uUrl').value.trim();
+  if(!url){st('m3uSt','أدخل الرابط','err');return;}
+  st('m3uSt','جاري التحميل...','info');
+  fetch(url).then(function(r){return r.text();}).then(function(txt){
+    var lines=txt.split('\n');
+    var chs=[];
+    for(var i=0;i<lines.length;i++){
+      if(lines[i].startsWith('#EXTINF')){
+        var m=lines[i].match(/tvg-name="([^"]*)"/);
+        var cat=lines[i].match(/group-title="([^"]*)"/);
+        var logo=lines[i].match(/tvg-logo="([^"]*)"/);
+        var name=m?m[1]:(lines[i].split(',').pop()||'قناة');
+        var nextUrl=(lines[i+1]||'').trim();
+        if(nextUrl&&!nextUrl.startsWith('#')){
+          chs.push({id:nid(),name:name.trim(),url:nextUrl,cat:(cat?cat[1]:'عام'),logo:(logo?logo[1]:'')});
+        }
+      }
+    }
+    if(chs.length){save(chs);render();st('m3uSt','✓ تم استيراد '+chs.length+' قناة','ok');}
+    else{st('m3uSt','لم يتم العثور على قنوات','err');}
+  }).catch(function(e){st('m3uSt','خطأ: '+e.message,'err');});
+}
+
+function importXtream(){
+  var srv=document.getElementById('xcSrv').value.trim().replace(/\/$/,'');
+  var u=document.getElementById('xcU').value.trim();
+  var p=document.getElementById('xcP').value.trim();
+  if(!srv||!u||!p){st('xcSt','أدخل جميع البيانات','err');return;}
+  var url=srv+'/get.php?username='+encodeURIComponent(u)+'&password='+encodeURIComponent(p)+'&type=m3u_plus&output=ts';
+  document.getElementById('m3uUrl').value=url;
+  st('xcSt','جاري الاستيراد...','info');
+  fetch(url).then(function(r){return r.text();}).then(function(txt){
+    var lines=txt.split('\n');var chs=[];
+    for(var i=0;i<lines.length;i++){
+      if(lines[i].startsWith('#EXTINF')){
+        var m=lines[i].match(/tvg-name="([^"]*)"/);
+        var cat=lines[i].match(/group-title="([^"]*)"/);
+        var logo=lines[i].match(/tvg-logo="([^"]*)"/);
+        var name=m?m[1]:(lines[i].split(',').pop()||'قناة');
+        var nextUrl=(lines[i+1]||'').trim();
+        if(nextUrl&&!nextUrl.startsWith('#')){chs.push({id:nid(),name:name.trim(),url:nextUrl,cat:(cat?cat[1]:'عام'),logo:(logo?logo[1]:'')});}
+      }
+    }
+    if(chs.length){save(chs);render();st('xcSt','✓ '+chs.length+' قناة','ok');}
+    else{st('xcSt','لم تُوجد قنوات','err');}
+  }).catch(function(e){st('xcSt','خطأ في الاتصال: '+e.message,'err');});
+}
+
+function exportJSON(){
+  var chs=load();
+  var blob=new Blob([JSON.stringify(chs,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='channels.json';a.click();
+}
+
+render();
+</script>
+</body>
+</html>
