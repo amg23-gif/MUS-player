@@ -591,11 +591,13 @@
     {id:'s335650',name:"|MA| U RADIO",url:"http://164898475139.fug-26.com/live/0664002407/o0clgod3en/335650.m3u8",cat:"|AR| ✪ MOROCCO RADIO",logo:""}
   ];}
 
+  var CH_VER='v267-ma';
   var CHS=(function(){
+    var ver=lget('mus_ch_ver',null);
     var a=lget(KEY,null);
-    // Reset to built-in channels if empty or only has old demo channels
-    var isOld=!Array.isArray(a)||!a.length||(a.length<=3&&a.some(function(c){return c.id==='d1'||c.id==='d2';}));
-    if(isOld){var d=defChs();lset(KEY,d);return d;}
+    if(ver!==CH_VER||!Array.isArray(a)||!a.length){
+      var d=defChs();lset(KEY,d);lset('mus_ch_ver',CH_VER);return d;
+    }
     return a;
   })();
   var FAVS=lget(FKEY,[]);
