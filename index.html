@@ -517,7 +517,7 @@
 
   /* ── Render ── */
   function mkLogo(logo,big){
-    if(logo&&logo.trim())return'<img src="'+esc(logo)+'" onerror="this.style.display='none'" style="width:100%;height:100%;object-fit:contain">';
+    if(logo&&logo.trim())return'<img src="'+esc(logo)+'" onerror="this.style.display=\'none\'" style="width:100%;height:100%;object-fit:contain">';
     return big?'<span style="font-size:22px">📺</span>':'📺';
   }
   function render(){
@@ -580,6 +580,7 @@
   document.getElementById('btnMenu').onclick=function(){document.getElementById('sidebar').classList.toggle('closed');};
   document.getElementById('btnFav').onclick=function(){favOnly=!favOnly;render();};
   document.getElementById('btnAdm').onclick=function(){openAdm();};
+  document.getElementById('btnAdm').addEventListener('touchstart',function(e){e.preventDefault();openAdm();},{passive:false});
 
   /* ── TV D-pad navigation ── */
   function gridItems(){return Array.from(document.getElementById('grid').querySelectorAll('.gc'));}
@@ -627,7 +628,24 @@
 
   /* ── Admin ── */
   function setSt(msg,ok){var el=document.getElementById('admSt');el.textContent=msg;el.style.color=ok?'var(--green)':'var(--muted)';}
-  function openAdm(){document.getElementById('admBg').classList.add('open');renderChmgr();setSt('');}
+  function openAdm(){
+    var el=document.getElementById('admBg');
+    el.style.display='block';
+    el.style.position='fixed';
+    el.style.top='0';
+    el.style.left='0';
+    el.style.right='0';
+    el.style.bottom='0';
+    el.style.width='100%';
+    el.style.height='100%';
+    el.style.zIndex='99999';
+    el.style.background='rgba(0,0,0,0.92)';
+    el.style.overflowY='auto';
+    el.style.padding='16px';
+    el.classList.add('open');
+    try{renderChmgr();}catch(e){}
+    try{setSt('');}catch(e){}
+  }
   function closeAdm(){document.getElementById('admBg').classList.remove('open');}
   document.getElementById('admClose').onclick=closeAdm;
   document.getElementById('admBg').addEventListener('click',function(e){if(e.target===this)closeAdm();});
