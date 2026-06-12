@@ -2,6 +2,9 @@
   <html lang="ar" dir="rtl">
   <head>
   <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#080a10">
   <title>MUS Player</title>
@@ -591,15 +594,9 @@
     {id:'s335650',name:"|MA| U RADIO",url:"http://164898475139.fug-26.com/live/0664002407/o0clgod3en/335650.m3u8",cat:"|AR| ✪ MOROCCO RADIO",logo:""}
   ];}
 
-  var CH_VER='v267-ma';
-  var CHS=(function(){
-    var ver=lget('mus_ch_ver',null);
-    var a=lget(KEY,null);
-    if(ver!==CH_VER||!Array.isArray(a)||!a.length){
-      var d=defChs();lset(KEY,d);lset('mus_ch_ver',CH_VER);return d;
-    }
-    return a;
-  })();
+  /* القنوات دائماً من القائمة المدمجة - لا اعتماد على localStorage */
+  var CHS=defChs();
+  lset(KEY,CHS);
   var FAVS=lget(FKEY,[]);
   var curId=null,aCat='الكل',sq_v='',favOnly=false,hls=null,ctrlTimer=null;
 
