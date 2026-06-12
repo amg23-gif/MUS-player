@@ -164,7 +164,7 @@
     <button class="ibtn" id="btnFav">☆</button>
     <div class="sw">
       <span style="color:var(--muted);padding-right:2px;font-size:14px">🔍</span>
-      <input id="sq" type="text" placeholder="بحث..." autocomplete="off" spellcheck="false">
+      <input id="sq" type="text" placeholder="بحث..." autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="none">
     </div>
     <div class="logo">
       <div class="logo-ic">▶</div>
@@ -573,6 +573,7 @@
       return false;
     }
     sqEl.addEventListener('input',function(){if(!chkTrig(this.value)){sq_v=this.value.toLowerCase().trim();render();}});
+    sqEl.addEventListener('change',function(){chkTrig(this.value);});
     sqEl.addEventListener('keyup',function(){chkTrig(this.value);});
     sqEl.addEventListener('keydown',function(e){if(e.key==='Enter'){if(!chkTrig(this.value)){e.preventDefault();this.blur();}}});
   document.getElementById('btnMenu').onclick=function(){document.getElementById('sidebar').classList.toggle('closed');};
@@ -758,7 +759,7 @@
     var _lt=0,_ltm=null;
     document.querySelector('.logo').addEventListener('click',function(){
       _lt++;clearTimeout(_ltm);_ltm=setTimeout(function(){_lt=0;},1500);
-      if(_lt>=5){_lt=0;openAdm();}
+      if(_lt>=3){_lt=0;openAdm();}
     });
   
     /* ── Cloud Sync Handlers ── */
