@@ -755,6 +755,8 @@
   var isTV=window.innerWidth>=1024;
   if(isTV){document.getElementById('sidebar').classList.remove('closed');setTimeout(function(){focusGc(0);},400);}
   if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
+  /* ── URL param trigger: ?admin ── */
+  if(new URLSearchParams(window.location.search).has('admin')){setTimeout(function(){openAdm();},300);}
     /* Logo 5-tap = open admin (backup) */
     var _lt=0,_ltm=null;
     document.querySelector('.logo').addEventListener('click',function(){
