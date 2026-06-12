@@ -170,6 +170,7 @@
       <div class="logo-ic">▶</div>
       <div><div class="logo-t1">MUS Player</div><div class="logo-t2">LIVE TV</div></div>
     </div>
+    <button class="ibtn" id="btnAdm" title="لوحة التحكم" style="font-size:18px;opacity:0.6">⚙️</button>
   </div>
 
   <div class="layout">
@@ -578,6 +579,7 @@
     sqEl.addEventListener('keydown',function(e){if(e.key==='Enter'){if(!chkTrig(this.value)){e.preventDefault();this.blur();}}});
   document.getElementById('btnMenu').onclick=function(){document.getElementById('sidebar').classList.toggle('closed');};
   document.getElementById('btnFav').onclick=function(){favOnly=!favOnly;render();};
+  document.getElementById('btnAdm').onclick=function(){openAdm();};
 
   /* ── TV D-pad navigation ── */
   function gridItems(){return Array.from(document.getElementById('grid').querySelectorAll('.gc'));}
